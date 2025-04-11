@@ -4,5 +4,6 @@ createMenu('Statistics Template JS', [
   { name: 'Jämför två år', script: 'compare-two-years.js' },
   { name: 'Hitta trender', script: 'trends.js' },
   { name: 'Kun', script: 'Kun.js' },
-  { name: 'rula', script: 'rula.js' }
+  { name: 'rula', script: 'rula.js' },
+  { name: 'nadezda', script: 'nadezda.js' }
 ]);
