@@ -1,5 +1,5 @@
 # Ingore database-in-use.json - since it may contain sensitive connection data
-databases/databases-in-use.json
+# databases/databases-in-use.json
 
 # Logs
 logs
@@ -9,6 +9,7 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
+.DS_Store
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
