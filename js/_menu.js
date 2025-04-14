@@ -3,7 +3,7 @@ createMenu('Statistics Template JS', [
   { name: 'Visa ett år', script: 'one-year.js' },
   { name: 'Jämför två år', script: 'compare-two-years.js' },
   { name: 'Hitta trender', script: 'trends.js' },
-  { name: 'Kun', script: 'Kun.js' },
+  { name: 'Kun', script: 'kun.js' },
   { name: 'rula', script: 'rula.js' },
   { name: 'nadezda', script: 'nadezda.js' }
 ]);
