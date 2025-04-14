@@ -5,5 +5,6 @@ createMenu('Statistics Template JS', [
   { name: 'Hitta trender', script: 'trends.js' },
   { name: 'Kun', script: 'kun.js' },
   { name: 'rula', script: 'rula.js' },
-  { name: 'nadezda', script: 'nadezda.js' }
+  { name: 'nadezda', script: 'nadezda.js' },
+  { name: 'hanadi', script: 'hanadi.js' }
 ]);
