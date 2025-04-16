@@ -6,5 +6,7 @@ createMenu('Statistics Template JS', [
   { name: 'kun', script: 'kun.js' },
   { name: 'rula', script: 'rula.js' },
   { name: 'nadezda', script: 'nadezda.js' },
-  { name: 'hanadi', script: 'hanadi.js' }
+  { name: 'hanadi', script: 'hanadi.js' },
+  { name: 'Kom igång!', script: 'startpage.js' },
+  { name: 'Övningsinstruktioner', script: 'instructions.js' }
 ]);
