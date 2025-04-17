@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"path": "../.git"
+		},
+		{
+			"path": "../backend"
+		},
+		{
+			"path": "../databases"
+		},
+		{
+			"path": "."
+		},
+		{
+			"path": "../node_modules"
+		}
+	]
+}
