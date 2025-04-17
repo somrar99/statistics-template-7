@@ -32,10 +32,28 @@ let sammanstallning = Object.entries(grupperadElectionResultsForWork).map(([komm
   };
 });
 
-let antalByten = sammanstallning.filter(r => r.byte === "!!! Ja!!!").length;
+// Kommuner där vinnande parti har ändrats (2018 → 2022)
+let kommunerMedByte = sammanstallning
+  .filter(r => r.byte === "!!! Ja!!!")
+  .map(r => r.kommun);
+
+// Kommuner där samma parti vann både 2018 och 2022
+let stabilaKommuner = sammanstallning
+  .filter(r => r.byte === "-")
+  .map(r => r.kommun);
+
+
+//let antalByten = kommunerMedByte.length;
 
 
 addMdToPage("### Vinnande parti per kommun - med byte mellan 2018 och 2022");
+
+addToPage(`
+  <h3>Antal kommuner med partibyte (2018–2022):</h3>
+  <p style="font-size: 1.2em; font-weight: bold; color: darkred;">
+    ${kommunerMedByte.length} kommuner
+  </p>
+`);
 
 
 
@@ -191,3 +209,8 @@ drawGoogleChart({
     chartArea: { left: 80, width: '80%' }
   }
 });
+
+
+
+
+
