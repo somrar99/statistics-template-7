@@ -1,10 +1,11 @@
 dbQuery.use('riksdagsval-neo4j');
 
-// Группируем по kommun
+
 let electionResultsForWork = await dbQuery('MATCH (n:Partiresultat) RETURN n');
 
 
 
+// Группируем по kommun
 let grupperadElectionResultsForWork = {};
 
 for (let item of electionResultsForWork) {
@@ -43,7 +44,7 @@ let stabilaKommuner = sammanstallning
   .map(r => r.kommun);
 
 
-//let antalByten = kommunerMedByte.length;
+
 
 
 addMdToPage("### Vinnande parti per kommun - med byte mellan 2018 och 2022");
@@ -139,6 +140,118 @@ drawGoogleChart({
 });
 
 
+
+
+
+// Собираем % голосов за выбранную партию по kommun
+let procentData = [];
+
+for (let kommun in grupperadElectionResultsForWork) {
+  let lista = grupperadElectionResultsForWork[kommun];
+
+  let total = s.sum(lista.map(r => +r[`roster${year}`]));
+  let partiRad = lista.find(r => r.parti === chosenParti);
+  if (!partiRad) continue;
+
+  let partiroster = +partiRad[`roster${year}`];
+  let procent = (partiroster / total) * 100;
+
+  procentData.push({
+    kommun,
+    procent: +procent.toFixed(2)
+  });
+}
+addMdToPage(`📊 Totalt antal kommuner i analysen: **${procentData.length}**`);
+
+
+
+drawGoogleChart({
+  type: 'Histogram',
+  data: [
+    ['Procent röster'],
+    ...procentData.map(x => [x.procent])
+  ],
+  options: {
+    title: `Andel röster för ${chosenParti} i varje kommun (${year})`,
+    height: 400,
+    histogram: { bucketSize: 2 },
+    hAxis: { title: 'Procent röster' },
+    vAxis: { title: 'Antal kommuner' }
+  }
+});
+
+let median = s.median(procentData.map(x => x.procent));
+let max = s.max(procentData.map(x => x.procent));
+let min = s.min(procentData.map(x => x.procent));
+
+addMdToPage(`
+### Statistik: ${chosenParti} (${year})
+- 🧮 Medianandel per kommun: **${median.toFixed(1)}%**
+- 📈 Högsta andel: **${max.toFixed(1)}%**
+- 📉 Lägsta andel: **${min.toFixed(1)}%**
+`);
+
+
+let values = procentData.map(x => x.procent);
+let result = stdLib.stats.shapiroWilkTest(values);
+
+addMdToPage(`
+### 📐 Shapiro-Wilk normalitetstest
+- p-värde: **${result.p.toFixed(4)}**
+- ${result.p < 0.05
+    ? "❌ Fördelningen verkar inte vara normalfördelad"
+    : "✅ Fördelningen verkar vara normalfördelad"}
+`);
+
+
+
+
+//объединять с procentData для анализа и корреляций:
+dbQuery.use('kommun-info-mongodb');
+let income = await dbQuery.collection('incomeByKommun').find({});
+console.log('income from mongodb', income);
+
+let incomeDataForTable = income.map(x => ({
+  kommun: x.kommun,
+  kön: x.kon,
+  medelInkomst2018: x.medelInkomst2018,
+  medelInkomst2019: x.medelInkomst2019,
+  medelInkomst2020: x.medelInkomst2020,
+  medelInkomst2021: x.medelInkomst2021,
+  medelInkomst2022: x.medelInkomst2022,
+  medianInkomst2018: x.medianInkomst2018,
+  medianInkomst2019: x.medianInkomst2019,
+  medianInkomst2020: x.medianInkomst2020,
+  medianInkomst2021: x.medianInkomst2021,
+  medianInkomst2022: x.medianInkomst2022
+}));
+
+
+let korrelationData = procentData.map(p => {
+  let row = incomeDataForTable.find(i => i.kommun === p.kommun && i.kön === 'totalt');
+  return row ? { kommun: p.kommun, procent: p.procent, inkomst: row.medelInkomst2022 } : null;
+}).filter(x => x);
+
+
+let r = s.sampleCorrelation(
+  korrelationData.map(x => x.inkomst),
+  korrelationData.map(x => x.procent)
+);
+
+addMdToPage(`
+### 📈 Enkel korrelation mellan inkomst och röstandel för ${chosenParti}
+- Pearson r: **${r.toFixed(3)}**
+- ${Math.abs(r) > 0.4
+    ? "↗️ Det verkar finnas ett samband"
+    : "↔️ Svagt eller inget tydligt samband"}
+`);
+
+
+
+
+
+
+
 let vansterPartier = ['Socialdemokraterna', 'Vänsterpartiet', 'Miljöpartiet', 'Centerpartiet'];
 let hogerPartier = ['Moderaterna', 'Kristdemokraterna', 'Liberalerna', 'Sverigedemokraterna'];
 
@@ -212,5 +325,52 @@ drawGoogleChart({
 
 
 
+//arbete med MySql
+
+dbQuery.use('geo-mysql');
+let geoData = await dbQuery('SELECT * FROM geoData');
+
+// Словарь kommun → län
+let kommunTillLan = {};
+for (let row of geoData) {
+  kommunTillLan[row.municipality] = row.county;
+}
+
+// Связываем kommuner med län från geoData
+let lanByteRaknare = {};
+
+for (let kommun of kommunerMedByte) {
+  let geoRad = geoData.find(x => x.municipality === kommun);
+  if (!geoRad) continue;
+
+  let lan = geoRad.county;
+  if (!lanByteRaknare[lan]) {
+    lanByteRaknare[lan] = 0;
+  }
+  lanByteRaknare[lan]++;
+}
+
+// Преобразуем в список для таблицы/диаграммы
+let lanByteLista = Object.entries(lanByteRaknare)
+  .map(([lan, antal]) => ({ Län: lan, 'Antal byten': antal }))
+  .sort((a, b) => b['Antal byten'] - a['Antal byten']);
 
 
+addMdToPage(`### Län där vinnande parti byttes i kommuner (2018–2022)`);
+
+tableFromData({
+  data: lanByteLista
+});
+
+
+drawGoogleChart({
+  type: 'ColumnChart',
+  data: [['Län', 'Antal byten'], ...lanByteLista.map(x => [x.Län, x['Antal byten']])],
+  options: {
+    title: 'Kommuner med partibyte per län (2018–2022)',
+    height: 600,
+    chartArea: { left: 100 },
+    legend: { position: 'none' },
+    hAxis: { slantedText: true, slantedTextAngle: 45 }
+  }
+});
