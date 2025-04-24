@@ -10,6 +10,11 @@
     "file": "counties.sqlite3"
   },
   {
+    "name": "HusPris-sqlite",
+    "type": "sqlite",
+    "file": "HusPris.sqlite3"
+  },
+  {
     "name": "geo-mysql",
     "type": "mysql",
     "credentials": {
