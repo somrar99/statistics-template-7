@@ -2,7 +2,7 @@ addMdToPage("### medel- och medianInkomst per kommun - från 2018 till 2022");
 
 dbQuery.use('kommun-info-mongodb');
 let income = await dbQuery.collection('incomeByKommun').find({});
-console.log('income from mongodb', income);
+//console.log('income from mongodb', income);
 
 let incomeDataForTable = income.map(x =>({
     kommun: x.kommun,
@@ -27,6 +27,94 @@ incomeDataForTable.sort((a, b) => {
   return a.kön.localeCompare(b.kön);
 });
 
-console.log('income for table', incomeDataForTable)
+//console.log('income for table', incomeDataForTable)
 
-tableFromData({data:incomeDataForTable});
+//tableFromData({data:incomeDataForTable});
+
+
+const kommunList = [...new Set(income.map(x => x.kommun))].sort();
+//console.log('kommunList', kommunList); 
+
+const könList = [...new Set(income.map(x => x.kon))].sort();
+console.log('könList', könList,''); 
+
+const years = [2018, 2019, 2020, 2021, 2022];
+
+function buildDataArray(kommunData,gender) {
+  const genderData = kommunData.find(x => x.kön === gender);
+  return [
+    ['År', 'MedelInkomst','MedianInkomst'],
+    ...years.map(year => [
+      year,
+      genderData?.[`medelInkomst${year}`] || null,
+      genderData?.[`medianInkomst${year}`] || null
+    ])
+  ];
+}
+
+let kommun1 = addDropdown('Kommun', kommunList, 'Stockholm');
+let gender1 = addDropdown('kön', könList, 'totalt');
+
+let dataKommun1 = incomeDataForTable.filter(x => x.kommun == kommun1);
+console.log('incomeDataForKommun1',dataKommun1);
+
+const selectedGenderDataKommun1  = buildDataArray(dataKommun1,gender1).slice(1);
+console.log('selectedGenderData',selectedGenderDataKommun1);
+
+
+drawGoogleChart({
+  type: 'LineChart',
+  data: makeChartFriendly(selectedGenderDataKommun1, 'År', 'MedelInkomst','MedianInkomst'),
+  options: {
+    height: 500,
+    chartArea: { left: 100, right: 200 },
+    curveType: 'function',
+    pointSize: 5,
+    pointShape: 'circle',
+    vAxis: { 
+      format: '#',
+      minValue:250,
+      maxValue:500,
+      title:"SEK"
+     },
+    hAxis: {
+      ticks: [2018, 2019, 2020, 2021, 2022],
+      format: '####'
+    },
+    title: `${kommun1}`
+  }
+});
+
+
+
+let kommun2 = addDropdown('Kommun', kommunList, 'Malmö');
+let gender2 = addDropdown('kön', könList, 'totalt');
+
+let dataKommun2 = incomeDataForTable.filter(x => x.kommun == kommun2);
+console.log('incomeDataForKommun2',dataKommu2);
+
+const selectedGenderDataKommun2  = buildDataArray(dataKommun2,gender2).slice(1);
+console.log('selectedGenderDataKommun2',selectedGenderDataKommun2);
+
+drawGoogleChart({
+  type: 'lineChart',
+  data: makeChartFriendly(selectedGenderDataKommun2, 'År', 'MedelInkomst','MedianInkomst'),
+  options: {
+    height: 500,
+    chartArea: { left: 100, right: 200 },
+    curveType: 'function',
+    pointSize: 5,
+    pointShape: 'circle',
+    vAxis: { 
+      format: '#',
+      minValue:250,
+      maxValue:500,
+      title:"SEK"
+     },
+    hAxis: {
+      ticks: [2018, 2019, 2020, 2021, 2022],
+      format: '####'
+    },
+    title: `${kommun2}`
+  }
+});
