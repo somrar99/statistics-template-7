@@ -257,7 +257,11 @@ addMdToPage(`
 
 
 
+<<<<<<< HEAD
 let vansterPartier = ['Arbetarepartiet-Socialdemokraterna', 'Vänsterpartiet', 'Miljöpartiet de gröna', 'Centerpartiet'];
+=======
+let vansterPartier = ['Socialdemokraterna', 'Vänsterpartiet', 'Miljöpartiet', 'Centerpartiet'];
+>>>>>>> 19c6fca503a03eaebd2c1fcc2df797e1a1737484
 let hogerPartier = ['Moderaterna', 'Kristdemokraterna', 'Liberalerna', 'Sverigedemokraterna'];
 
 // Суммируем по блокам
@@ -386,9 +390,56 @@ drawGoogleChart({
 
 
 
+//arbete med MySql
+
+dbQuery.use('geo-mysql');
+let geoData = await dbQuery('SELECT * FROM geoData');
+
+// Словарь kommun → län
+let kommunTillLan = {};
+for (let row of geoData) {
+  kommunTillLan[row.municipality] = row.county;
+}
+
+// Связываем kommuner med län från geoData
+let lanByteRaknare = {};
+
+for (let kommun of kommunerMedByte) {
+  let geoRad = geoData.find(x => x.municipality === kommun);
+  if (!geoRad) continue;
+
+  let lan = geoRad.county;
+  if (!lanByteRaknare[lan]) {
+    lanByteRaknare[lan] = 0;
+  }
+  lanByteRaknare[lan]++;
+}
+
+// Преобразуем в список для таблицы/диаграммы
+let lanByteLista = Object.entries(lanByteRaknare)
+  .map(([lan, antal]) => ({ Län: lan, 'Antal byten': antal }))
+  .sort((a, b) => b['Antal byten'] - a['Antal byten']);
 
 //Dataset från https://www.statistikdatabasen.scb.se/pxweb/sv/ssd/START__BO__BO0501__BO0501B/FastprisSHRegionAr/sortedtable/tableViewSorted/
 
 
 
 
+addMdToPage(`### Län där vinnande parti byttes i kommuner (2018–2022)`);
+
+tableFromData({
+  data: lanByteLista
+});
+
+
+drawGoogleChart({
+  type: 'ColumnChart',
+  data: [['Län', 'Antal byten'], ...lanByteLista.map(x => [x.Län, x['Antal byten']])],
+  options: {
+    title: 'Kommuner med partibyte per län (2018–2022)',
+    height: 600,
+    chartArea: { left: 100 },
+    legend: { position: 'none' },
+    hAxis: { slantedText: true, slantedTextAngle: 45 }
+  }
+});
