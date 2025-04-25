@@ -1,41 +1,5 @@
-dbQuery.use('riksdagsval-neo4j');
 
 
-let electionResultsForWork = await dbQuery('MATCH (n:Partiresultat) RETURN n');
-electionResultsForWork = electionResultsForWork.map(x => ({
-  ...x,
-  parti: x.parti.trim()
-}));
-
-
-
-// Группируем по kommun
-let grupperadElectionResultsForWork = {};
-
-for (let item of electionResultsForWork) {
-  const { kommun, parti, roster2018, roster2022 } = item;
-  if (!grupperadElectionResultsForWork[kommun]) {
-    grupperadElectionResultsForWork[kommun] = [];
-  }
-  grupperadElectionResultsForWork[kommun].push({ parti, roster2018, roster2022 });
-}
-
-// Определим победителя + флаг смены
-let sammanstallning = Object.entries(grupperadElectionResultsForWork).map(([kommun, list]) => {
-  let vinnare2018 = list.reduce((max, curr) => curr.roster2018 > max.roster2018 ? curr : max);
-  let vinnare2022 = list.reduce((max, curr) => curr.roster2022 > max.roster2022 ? curr : max);
-
-  const byttParti = vinnare2018.parti !== vinnare2022.parti;
-
-  return {
-    kommun,
-    vinnare2018: vinnare2018.parti,
-    roster2018: vinnare2018.roster2018,
-    vinnare2022: vinnare2022.parti,
-    roster2022: vinnare2022.roster2022,
-    byte: byttParti ? "!!! Ja!!!" : "-"
-  };
-});
 
 // Kommuner där vinnande parti har ändrats (2018 → 2022)
 let kommunerMedByte = sammanstallning
@@ -109,11 +73,7 @@ let partyVotes = s.sum(
 let percent = ((partyVotes / totalVotes) * 100).toFixed(1);
 
 // Показываем
-/*
-addMdToPage(`### Partiet *${chosenParti}* år ${year} von i ${antalKommunerMedVinst} kommun`);
-addMdToPage(`Totalt antal röster: **${partyVotes.toLocaleString('sv-SE')}** i landet för valt år. 
-Andel av alla röster: **${percent}%**`);
-*/
+
 addToPage(`
   <div style="display: flex; justify-content: space-between; gap: 30px; align-items: flex-start;">
     
@@ -257,11 +217,7 @@ addMdToPage(`
 
 
 
-<<<<<<< HEAD
 let vansterPartier = ['Arbetarepartiet-Socialdemokraterna', 'Vänsterpartiet', 'Miljöpartiet de gröna', 'Centerpartiet'];
-=======
-let vansterPartier = ['Socialdemokraterna', 'Vänsterpartiet', 'Miljöpartiet', 'Centerpartiet'];
->>>>>>> 19c6fca503a03eaebd2c1fcc2df797e1a1737484
 let hogerPartier = ['Moderaterna', 'Kristdemokraterna', 'Liberalerna', 'Sverigedemokraterna'];
 
 // Суммируем по блокам
@@ -336,22 +292,17 @@ drawGoogleChart({
   }
 });
 
-
-
-//arbete med MySql
-
 dbQuery.use('geo-mysql');
-let geoData = await dbQuery('SELECT * FROM geoData');
+let geoData = await dbQuery('SELECT * FROM geoData  ORDER BY latitude');
 
-// Словарь kommun → län
+// 1. Создаём словарь kommun → län
 let kommunTillLan = {};
 for (let row of geoData) {
   kommunTillLan[row.municipality] = row.county;
 }
 
-// Связываем kommuner med län från geoData
+// 2. Строим lanByteRaknare на основе kommunerMedByte
 let lanByteRaknare = {};
-
 for (let kommun of kommunerMedByte) {
   let geoRad = geoData.find(x => x.municipality === kommun);
   if (!geoRad) continue;
@@ -363,18 +314,16 @@ for (let kommun of kommunerMedByte) {
   lanByteRaknare[lan]++;
 }
 
-// Преобразуем в список для таблицы/диаграммы
+// ✅ 3. Теперь можно использовать lanByteRaknare!
 let lanByteLista = Object.entries(lanByteRaknare)
   .map(([lan, antal]) => ({ Län: lan, 'Antal byten': antal }))
   .sort((a, b) => b['Antal byten'] - a['Antal byten']);
-
 
 addMdToPage(`### Län där vinnande parti byttes i kommuner (2018–2022)`);
 
 tableFromData({
   data: lanByteLista
 });
-
 
 drawGoogleChart({
   type: 'ColumnChart',
@@ -390,56 +339,8 @@ drawGoogleChart({
 
 
 
-//arbete med MySql
-
-dbQuery.use('geo-mysql');
-let geoData = await dbQuery('SELECT * FROM geoData');
-
-// Словарь kommun → län
-let kommunTillLan = {};
-for (let row of geoData) {
-  kommunTillLan[row.municipality] = row.county;
-}
-
-// Связываем kommuner med län från geoData
-let lanByteRaknare = {};
-
-for (let kommun of kommunerMedByte) {
-  let geoRad = geoData.find(x => x.municipality === kommun);
-  if (!geoRad) continue;
-
-  let lan = geoRad.county;
-  if (!lanByteRaknare[lan]) {
-    lanByteRaknare[lan] = 0;
-  }
-  lanByteRaknare[lan]++;
-}
-
-// Преобразуем в список для таблицы/диаграммы
-let lanByteLista = Object.entries(lanByteRaknare)
-  .map(([lan, antal]) => ({ Län: lan, 'Antal byten': antal }))
-  .sort((a, b) => b['Antal byten'] - a['Antal byten']);
-
 //Dataset från https://www.statistikdatabasen.scb.se/pxweb/sv/ssd/START__BO__BO0501__BO0501B/FastprisSHRegionAr/sortedtable/tableViewSorted/
 
 
 
 
-addMdToPage(`### Län där vinnande parti byttes i kommuner (2018–2022)`);
-
-tableFromData({
-  data: lanByteLista
-});
-
-
-drawGoogleChart({
-  type: 'ColumnChart',
-  data: [['Län', 'Antal byten'], ...lanByteLista.map(x => [x.Län, x['Antal byten']])],
-  options: {
-    title: 'Kommuner med partibyte per län (2018–2022)',
-    height: 600,
-    chartArea: { left: 100 },
-    legend: { position: 'none' },
-    hAxis: { slantedText: true, slantedTextAngle: 45 }
-  }
-});
