@@ -36,3 +36,4 @@ export default Object.entries(grupperadElectionResultsForWork).map(([kommun, lis
     byte: byttParti ? "!!! Ja!!!" : "-"
   };
 });
+

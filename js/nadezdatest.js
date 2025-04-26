@@ -118,7 +118,7 @@ addToPage(`
 `);
 
 
-/*
+
 tableFromData({
   data: sammanstallning.map(row => {
     const highlight = row.byte === " Ja";
@@ -132,7 +132,7 @@ tableFromData({
     };
   })
 });
-*/
+
 
 //console.log(electionResultsForWork.filter(x => x.parti === "Liberalerna "));
 
@@ -142,6 +142,15 @@ let partier = [...new Set(electionResultsForWork.map(x => x.parti))].sort();
 
 // Создаем два выпадающих меню
 let year = addDropdown('Välj år', years, 2022);
+
+
+/*
+// 2. Считаем количество коммун, где партия победила в выбранном году
+let antalKommunerMedVinst = sammanstallning.filter(row =>
+  (year == 2018 && row.vinnare2018 === chosenParti) ||
+  (year == 2022 && row.vinnare2022 === chosenParti)
+).length;
+*/
 
 // Считаем общее число голосов за выбранный год
 let totalVotes = s.sum(
@@ -164,6 +173,41 @@ let percentPerParty = partier.map(parti => {
 // Выведем результат
 console.log(percentPerParty);
 
+
+//DATASET https://www.statistikdatabasen.scb.se/pxweb/sv/ssd/START__ME__ME0104__ME0104D/ME0104T4/
+
+/* Показываем
+
+addToPage(`
+  <div style="display: flex; justify-content: space-between; gap: 30px; align-items: flex-start;">
+    
+    <div style="flex: 1;">
+      <h3>${chosenParti}, år ${year}</h3>
+      <p>Partiet <strong>${chosenParti}</strong> vann i <strong>${antalKommunerMedVinst}</strong> kommuner.</p>
+      <p>Totalt antal röster: <strong>${partyVotes.toLocaleString('sv-SE')}</strong> i landet för valt år.</p>
+      <p>Andel av alla röster: <strong>${percent}%</strong></p>
+    </div>
+
+    <div id="pieChartContainer" style="flex: 1;"></div>
+
+  </div>
+`);
+
+drawGoogleChart({
+  type: 'PieChart',
+  elementId: 'pieChartContainer',
+  data: [
+    ['Parti', 'Röster'],
+    [chosenParti, partyVotes],
+    ['Övriga', totalVotes - partyVotes]
+  ],
+  options: {
+    title: `Andel av röster, år ${year}`,
+    height: 300,
+    pieHole: 0.4
+  }
+});
+*/
 
 // Рисуем круговую диаграмму
 drawGoogleChart({
@@ -288,6 +332,96 @@ for (let kommun in grupperadElectionResultsForWork) {
   });
 }
 
+/*
+addMdToPage(`📊 Totalt antal kommuner i analysen: **${procentData.length}**`);
+
+
+
+drawGoogleChart({
+  type: 'Histogram',
+  data: [
+    ['Procent röster'],
+    ...procentData.map(x => [x.procent])
+  ],
+  options: {
+    title: `Andel röster för ${chosenParti} i varje kommun (${year})`,
+    height: 400,
+    histogram: { bucketSize: 2 },
+    hAxis: { title: 'Procent röster' },
+    vAxis: { title: 'Antal kommuner' }
+  }
+});
+
+let median = s.median(procentData.map(x => x.procent));
+let max = s.max(procentData.map(x => x.procent));
+let min = s.min(procentData.map(x => x.procent));
+
+addMdToPage(`
+### Statistik: ${chosenParti} (${year})
+- 🧮 Medianandel per kommun: **${median.toFixed(1)}%**
+- 📈 Högsta andel: **${max.toFixed(1)}%**
+- 📉 Lägsta andel: **${min.toFixed(1)}%**
+`);
+
+
+let values = procentData.map(x => x.procent);
+let result = stdLib.stats.shapiroWilkTest(values);
+
+addMdToPage(`
+### 📐 Shapiro-Wilk normalitetstest
+- p-värde: **${result.p.toFixed(4)}**
+- ${result.p < 0.05
+    ? "❌ Fördelningen verkar inte vara normalfördelad"
+    : "✅ Fördelningen verkar vara normalfördelad"}
+`);
+
+
+
+
+//объединять с procentData для анализа и корреляций:
+dbQuery.use('kommun-info-mongodb');
+let income = await dbQuery.collection('incomeByKommun').find({});
+console.log('income from mongodb', income);
+
+let incomeDataForTable = income.map(x => ({
+  kommun: x.kommun,
+  kön: x.kon,
+  medelInkomst2018: x.medelInkomst2018,
+  medelInkomst2019: x.medelInkomst2019,
+  medelInkomst2020: x.medelInkomst2020,
+  medelInkomst2021: x.medelInkomst2021,
+  medelInkomst2022: x.medelInkomst2022,
+  medianInkomst2018: x.medianInkomst2018,
+  medianInkomst2019: x.medianInkomst2019,
+  medianInkomst2020: x.medianInkomst2020,
+  medianInkomst2021: x.medianInkomst2021,
+  medianInkomst2022: x.medianInkomst2022
+}));
+
+
+let korrelationData = procentData.map(p => {
+  let row = incomeDataForTable.find(i => i.kommun === p.kommun && i.kön === 'totalt');
+  return row ? { kommun: p.kommun, procent: p.procent, inkomst: row.medelInkomst2022 } : null;
+}).filter(x => x);
+
+
+let r = s.sampleCorrelation(
+  korrelationData.map(x => x.inkomst),
+  korrelationData.map(x => x.procent)
+);
+
+addMdToPage(`
+### 📈 Enkel korrelation mellan inkomst och röstandel för ${chosenParti}
+- Pearson r: **${r.toFixed(3)}**
+- ${Math.abs(r) > 0.4
+    ? "↗️ Det verkar finnas ett samband"
+    : "↔️ Svagt eller inget tydligt samband"}
+`);
+*/
+
+
+
+
 
 dbQuery.use('geo-mysql');
 let geoData = await dbQuery('SELECT * FROM geoData  ORDER BY latitude');
@@ -310,7 +444,94 @@ for (let kommun of kommunerMedByte) {
   }
   lanByteRaknare[lan]++;
 }
+/*
+// ✅ 3. Теперь можно использовать lanByteRaknare!
+let lanByteLista = Object.entries(lanByteRaknare)
+  .map(([lan, antal]) => ({ Län: lan, 'Antal byten': antal }))
+  .sort((a, b) => b['Antal byten'] - a['Antal byten']);
 
+addMdToPage(`### Län där vinnande parti byttes i kommuner (2018–2022)`);
+
+tableFromData({
+  data: lanByteLista
+});
+
+drawGoogleChart({
+  type: 'ColumnChart',
+  data: [['Län', 'Antal byten'], ...lanByteLista.map(x => [x.Län, x['Antal byten']])],
+  options: {
+    title: 'Kommuner med partibyte per län (2018–2022)',
+    height: 600,
+    chartArea: { left: 100 },
+    legend: { position: 'none' },
+    hAxis: { slantedText: true, slantedTextAngle: 45, min: 0 }
+  }
+});
+*/
+
+
+//Dataset från https://www.statistikdatabasen.scb.se/pxweb/sv/ssd/START__BO__BO0501__BO0501B/FastprisSHRegionAr/sortedtable/tableViewSorted/
+
+
+
+/*
+//2. Изменение голосов по партиям: разница между 2022 и 2018
+
+let diffVotes = electionResultsForWork
+  .filter(x => x.parti === chosenParti)
+  .map(x => +x.roster2022 - +x.roster2018);
+
+
+/*🔹 Вариант 1: Гистограмма разницы голосов
+Ось X — это разбивка по интервалам разницы (например: от −1000 до +1000)
+
+Ось Y — это количество коммун, попавших в каждый интервал
+
+🔁 Это показывает распределение изменений:
+Больше коммун прибавили или потеряли голоса? Насколько сильно?
+*/
+/*
+drawGoogleChart({
+  type: 'Histogram',
+  data: makeChartFriendly(
+    diffVotes.map(x => ({ x })), // массив объектов: { x: число }
+    'Δ röster'
+  ),
+  options: {
+    title: `Röstförändring för ${chosenParti} per kommun (2022 − 2018)`,
+    height: 500,
+    histogram: { bucketSize: 250 }
+  }
+});
+
+/*🔹 Вариант 2: Диаграмма рассеяния (scatterplot)
+Если ты хочешь по каждой коммуне:
+
+Ось X — например, исходное число голосов в 2018
+
+Ось Y — разница голосов между 2022 и 2018
+
+Это покажет, связано ли увеличение/уменьшение с изначальным уровнем поддержки.
+*/
+/*
+let scatterData = electionResultsForWork
+  .filter(x => x.parti === chosenParti)
+  .map(x => ({
+    roster2018: +x.roster2018,
+    diff: +x.roster2022 - +x.roster2018
+  }));
+
+drawGoogleChart({
+  type: 'ScatterChart',
+  data: makeChartFriendly(scatterData, 'roster2018', 'Δ röster'),
+  options: {
+    title: `Röstförändring för ${chosenParti} i förhållande till stöd 2018`,
+    height: 500,
+    hAxis: { title: 'Röster 2018' },
+    vAxis: { title: 'Förändring (2022 − 2018)' }
+  }
+});
+*/
 
 
 // Выбираем данные по выбранной партии и считаем процентное изменение
@@ -392,320 +613,3 @@ addMdToPage(`
 
 
 
-
-//Dataset från https:/ / www.statistikdatabasen.scb.se / pxweb / sv / ssd / START__BO__BO0501__BO0501B / FastprisSHRegionAr / sortedtable / tableViewSorted /
-
-
-addMdToPage(`
-  ### Länsinfo, från SQlite
-  Info om HusPriser per kommun i tussen kronor
-  `);
-dbQuery.use('HusPris-sqlite');
-let meddelHusPris = await dbQuery('SELECT SUBSTR(Region, 6) AS Kommun,  "2018",  "2022" FROM HusPrisITusenKr; ');
-//tableFromData({ data: meddelHusPris });
-console.log(meddelHusPris);
-
-
-dbQuery.use('kommun-info-mongodb');
-let income = await dbQuery.collection('incomeByKommun').find({});
-
-// Фильтруем и трансформируем данные
-let cleanedIncome = income.map(doc => ({
-  kommun: doc.kommun,
-  medelInkomst2018: doc.medelInkomst2018,
-  medelInkomst2022: doc.medelInkomst2022
-}));
-
-//console.table(cleanedIncome.slice(0, 5));
-
-// Преобразуем доход в словарь по названию коммуны
-let incomeMap = {};
-cleanedIncome.forEach(doc => {
-  incomeMap[doc.kommun] = {
-    medel2018: doc.medelInkomst2018,
-    medel2022: doc.medelInkomst2022
-  };
-});
-
-// Соединяем с ценами и делим
-let priceToIncome = meddelHusPris.map(row => {
-  let kommun = row.Kommun;
-  let income = incomeMap[kommun];
-
-  let kvot2018 = row["2018"] / income.medel2018;
-  let kvot2022 = row["2022"] / income.medel2022;
-  let tillväxtInkomst = ((income.medel2022 - income.medel2018) / income.medel2018) * 100;
-  let tillväxtKvot = ((kvot2022 - kvot2018) / kvot2018) * 100;
-
-  return {
-    kommun,
-    'Tillväxt inkomst (%)': +tillväxtInkomst.toFixed(1),
-    'Kvot 2018': +kvot2018.toFixed(2),
-    'Kvot 2022': +kvot2022.toFixed(2),
-    'Tillväxt kvot (%)': +tillväxtKvot.toFixed(1)
-  };
-});
-
-
-//2. Сортируем:
-
-let sortablePriceToIncome = [...priceToIncome].sort(
-  (a, b) => a['Tillväxt kvot (%)'] - b['Tillväxt kvot (%)']
-);
-
-
-
-
-//3. Выбираем лучший и худший результат:
-
-let bästKommun = sortablePriceToIncome[0]; // самое сильное улучшение доступности
-let sämstKommun = sortablePriceToIncome[sortablePriceToIncome.length - 1]; // самое сильное ухудшение
-//4. Выводим красиво через addMdToPage:
-
-addMdToPage(`
-  ### 📈 Tillväxt i boendeaffordabilitet (2018–2022)
-
-  **Mest förbättrad tillgänglighet:**
-  - Kommun: **${bästKommun.kommun}**
-  - Tillväxt kvot: **${bästKommun['Tillväxt kvot (%)']}%**  
-  - Kvot 2018: **${bästKommun['Kvot 2018']}**
-  - Kvot 2022: **${bästKommun['Kvot 2022']}**
-
-  **Mest försämrad tillgänglighet:**
-  - Kommun: **${sämstKommun.kommun}**
-  - Tillväxt kvot: **${sämstKommun['Tillväxt kvot (%)']}%**  
-  - Kvot 2018: **${sämstKommun['Kvot 2018']}**
-  - Kvot 2022: **${sämstKommun['Kvot 2022']}**
-`);
-
-
-//Как правильно сортировать строки по алфавиту
-let sortedByKommun = [...priceToIncome].sort((a, b) =>
-  a['kommun'].localeCompare(b['kommun'])
-);
-
-//tableFromData({ data: sortedByKommun });
-
-
-
-let finalTable = priceToIncome.map(row => {
-  let match = sammanstallning.find(s => s.kommun === row.kommun);
-
-  return {
-    ...row,
-    vinnare2018: match ? match.vinnare2018 : null,
-    vinnare2022: match ? match.vinnare2022 : null,
-    byte: match ? match.byte : null
-  };
-});
-//export default sammanstallning;
-console.table(finalTable);
-
-
-
-//1. Считаем потерю голосов по каждой коммуне для каждой партии
-
-let liberalerData = electionResultsForWork
-  .filter(r => r.parti === 'Liberalerna')
-  .map(r => ({
-    kommun: r.kommun,
-    diffProcent: ((+r.roster2022 - +r.roster2018) / +r.roster2018) * 100
-  }));
-
-let centerpartietData = electionResultsForWork
-  .filter(r => r.parti === 'Centerpartiet')
-  .map(r => ({
-    kommun: r.kommun,
-    diffProcent: ((+r.roster2022 - +r.roster2018) / +r.roster2018) * 100
-  }));
-//2. Превращаем это в словари для быстрого поиска:
-
-let liberalerMap = {};
-liberalerData.forEach(r => {
-  liberalerMap[r.kommun] = r.diffProcent;
-});
-
-let centerpartietMap = {};
-centerpartietData.forEach(r => {
-  centerpartietMap[r.kommun] = r.diffProcent;
-});
-//3. Теперь собираем таблицу: Kommun + потери + Tillväxt kvot
-
-let combinedData = priceToIncome.map(row => {
-  let kommun = row.kommun;
-
-  return {
-    kommun,
-    'Liberalerna röster diff (%)': liberalerMap[kommun] ?? null,
-    'Centerpartiet röster diff (%)': centerpartietMap[kommun] ?? null,
-    'Tillväxt kvot (%)': row['Tillväxt kvot (%)']
-  };
-});
-
-//tableFromData({ data: combinedData });
-
-
-
-//Ось X — Tillväxt kvot(%)(насколько жильё стало доступнее / дороже)
-//Ось Y — Liberalerna röster diff(%) или Centerpartiet röster diff(%)
-//Разными цветами — для либералов и для центра.
-//1. Подготавливаем данные:
-
-let scatterDataLiberalerna = combinedData
-  .filter(r => r['Liberalerna röster diff (%)'] !== null)
-  .map(r => ({
-    tillvaxtKvot: r['Tillväxt kvot (%)'],
-    diffProcent: r['Liberalerna röster diff (%)']
-  }));
-
-let scatterDataCenterpartiet = combinedData
-  .filter(r => r['Centerpartiet röster diff (%)'] !== null)
-  .map(r => ({
-    tillvaxtKvot: r['Tillväxt kvot (%)'],
-    diffProcent: r['Centerpartiet röster diff (%)']
-  }));
-//2. Рисуем ScatterChart для обеих партий:
-
-drawGoogleChart({
-  type: 'ScatterChart',
-  data: [
-    ['Tillväxt kvot (%)', 'Liberalerna (%)', 'Centerpartiet (%)'],
-    ...scatterDataLiberalerna.map((r, idx) => [
-      r.tillvaxtKvot,
-      r.diffProcent,
-      scatterDataCenterpartiet[idx] ? scatterDataCenterpartiet[idx].diffProcent : null
-    ])
-  ],
-  options: {
-    title: 'Samband mellan boendeaffordabilitet och partisupport',
-    height: 500,
-    hAxis: { title: 'Tillväxt kvot (%)' },
-    vAxis: { title: 'Förändring i röster (%)' },
-    legend: { position: 'top' },
-    pointSize: 5,
-    series: {
-      0: { color: '#3498db', labelInLegend: 'Liberalerna' },
-      1: { color: '#2ecc71', labelInLegend: 'Centerpartiet' }
-    },
-    chartArea: { left: 60, top: 50, width: '80%', height: '70%' }
-  }
-});
-
-//1. Считаем процентную разницу по каждому из ТОП - 3 партий:
-
-let socialdemokraternaData = electionResultsForWork
-  .filter(r => r.parti === 'Arbetarepartiet-Socialdemokraterna')
-  .map(r => ({
-    kommun: r.kommun,
-    diffProcent: ((+r.roster2022 - +r.roster2018) / +r.roster2018) * 100
-  }));
-
-let moderaternaData = electionResultsForWork
-  .filter(r => r.parti === 'Moderaterna')
-  .map(r => ({
-    kommun: r.kommun,
-    diffProcent: ((+r.roster2022 - +r.roster2018) / +r.roster2018) * 100
-  }));
-
-let sverigedemokraternaData = electionResultsForWork
-  .filter(r => r.parti === 'Sverigedemokraterna')
-  .map(r => ({
-    kommun: r.kommun,
-    diffProcent: ((+r.roster2022 - +r.roster2018) / +r.roster2018) * 100
-  }));
-//2. Создаём словари для быстрого сопоставления:
-
-let sMap = {}, mMap = {}, sdMap = {};
-
-socialdemokraternaData.forEach(r => sMap[r.kommun] = r.diffProcent);
-moderaternaData.forEach(r => mMap[r.kommun] = r.diffProcent);
-sverigedemokraternaData.forEach(r => sdMap[r.kommun] = r.diffProcent);
-//3. Собираем общий массив для графика:
-
-let combinedTop3 = priceToIncome.map(row => {
-  let kommun = row.kommun;
-
-  return {
-    kommun,
-    tillvaxtKvot: row['Tillväxt kvot (%)'],
-    socialdemokraterna: sMap[kommun] ?? null,
-    moderaterna: mMap[kommun] ?? null,
-    sverigedemokraterna: sdMap[kommun] ?? null
-  };
-});
-//4. Готовим данные для scatter plot:
-
-let scatterData = [
-  ['Tillväxt kvot (%)', 'Socialdemokraterna (%)', 'Moderaterna (%)', 'Sverigedemokraterna (%)'],
-  ...combinedTop3.map(r => [
-    r.tillvaxtKvot,
-    r.socialdemokraterna,
-    r.moderaterna,
-    r.sverigedemokraterna
-  ])
-];
-//5. Рисуем красивый график:
-
-drawGoogleChart({
-  type: 'ScatterChart',
-  data: scatterData,
-  options: {
-    title: 'Samband mellan boendeaffordabilitet och partisupport (Topp 3)',
-    height: 500,
-    hAxis: { title: 'Tillväxt kvot (%)' },
-    vAxis: { title: 'Förändring i röster (%)' },
-    legend: { position: 'top' },
-    pointSize: 3,
-    series: {
-      0: { color: '#FF0000', labelInLegend: 'Socialdemokraterna' }, // 🔴 Красный
-      1: { color: '#FFD700', labelInLegend: 'Moderaterna' },        // 🟡 Жёлтый
-      2: { color: '#FF00FF', labelInLegend: 'Sverigedemokraterna' }  // 🌸 Яркая фуксия!
-    },
-    chartArea: { left: 60, top: 50, width: '80%', height: '70%' }
-  }
-});
-
-
-//pearson
-//1. Готовим данные для корреляции:
-
-let socialData = combinedTop3
-  .filter(r => r.socialdemokraterna !== null && r.tillvaxtKvot !== null)
-  .map(r => [r.tillvaxtKvot, r.socialdemokraterna]);
-
-let moderatData = combinedTop3
-  .filter(r => r.moderaterna !== null && r.tillvaxtKvot !== null)
-  .map(r => [r.tillvaxtKvot, r.moderaterna]);
-
-let sdData = combinedTop3
-  .filter(r => r.sverigedemokraterna !== null && r.tillvaxtKvot !== null)
-  .map(r => [r.tillvaxtKvot, r.sverigedemokraterna]);
-//2. Вычисляем корреляцию:
-
-let socialR = s.sampleCorrelation(
-  socialData.map(r => r[0]),
-  socialData.map(r => r[1])
-);
-
-let moderatR = s.sampleCorrelation(
-  moderatData.map(r => r[0]),
-  moderatData.map(r => r[1])
-);
-
-let sdR = s.sampleCorrelation(
-  sdData.map(r => r[0]),
-  sdData.map(r => r[1])
-);
-//3. Выводим красиво на страницу:
-
-addMdToPage(`
-  ### 📈 Samband mellan boendeaffordabilitet och partisupport (Pearson r)
-
-  - **Socialdemokraterna**: r = **${socialR.toFixed(3)}**
-  - **Moderaterna**: r = **${moderatR.toFixed(3)}**
-  - **Sverigedemokraterna**: r = **${sdR.toFixed(3)}**
-
-  ${Math.abs(socialR) < 0.2 && Math.abs(moderatR) < 0.2 && Math.abs(sdR) < 0.2
-    ? "🔵 Det verkar inte finnas något starkt samband."
-    : "🔴 Vissa samband kan finnas!"}
-`);
