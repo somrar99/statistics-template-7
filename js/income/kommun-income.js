@@ -53,16 +53,16 @@ function buildDataArray(kommunData,gender) {
 }
 
 let kommun1 = addDropdown('Kommun', kommunList, 'Stockholm');
-let gender1 = addDropdown('kön', könList, 'totalt');
+let kön1 = addDropdown('Kön', könList, 'totalt');
 
 let dataKommun1 = incomeDataForTable.filter(x => x.kommun == kommun1);
-console.log('incomeDataForKommun1',dataKommun1);
+//console.log('incomeDataForKommun1',dataKommun1);
 
-const selectedGenderDataKommun1  = buildDataArray(dataKommun1,gender1).slice(1);
-console.log('selectedGenderData',selectedGenderDataKommun1);
-
+const selectedGenderDataKommun1  = buildDataArray(dataKommun1,kön1).slice(1);
+//console.log('selectedGenderData',selectedGenderDataKommun1);
 
 drawGoogleChart({
+  elementId: 'income_line_chart1', 
   type: 'LineChart',
   data: makeChartFriendly(selectedGenderDataKommun1, 'År', 'MedelInkomst','MedianInkomst'),
   options: {
@@ -75,29 +75,28 @@ drawGoogleChart({
       format: '#',
       minValue:250,
       maxValue:500,
-      title:"SEK"
+      title:"TSEK"
      },
     hAxis: {
       ticks: [2018, 2019, 2020, 2021, 2022],
       format: '####'
     },
-    title: `${kommun1}`
+    title: `${kommun1} Kommun`
   }
 });
 
-
-
 let kommun2 = addDropdown('Kommun', kommunList, 'Malmö');
-let gender2 = addDropdown('kön', könList, 'totalt');
+let kön2 = addDropdown('Kön', könList, 'totalt');
 
 let dataKommun2 = incomeDataForTable.filter(x => x.kommun == kommun2);
-console.log('incomeDataForKommun2',dataKommu2);
+//console.log('incomeDataForKommun2',dataKommu2);
 
-const selectedGenderDataKommun2  = buildDataArray(dataKommun2,gender2).slice(1);
-console.log('selectedGenderDataKommun2',selectedGenderDataKommun2);
+const selectedGenderDataKommun2  = buildDataArray(dataKommun2,kön2).slice(1);
+//console.log('selectedGenderDataKommun2',selectedGenderDataKommun2);
 
 drawGoogleChart({
-  type: 'lineChart',
+  elementId: 'income_line_chart2', 
+  type: 'LineChart',
   data: makeChartFriendly(selectedGenderDataKommun2, 'År', 'MedelInkomst','MedianInkomst'),
   options: {
     height: 500,
@@ -109,12 +108,12 @@ drawGoogleChart({
       format: '#',
       minValue:250,
       maxValue:500,
-      title:"SEK"
+      title:"TSEK"
      },
     hAxis: {
-      ticks: [2018, 2019, 2020, 2021, 2022],
+      ticks: years,
       format: '####'
     },
-    title: `${kommun2}`
+    title: `${kommun2} Kommun`
   }
 });

@@ -43,5 +43,13 @@
       "password": "xlMeKNeW8v9k",
       "database": "neo4j"
     }
+  },
+  {
+    "name": "test-mongodb",
+    "type": "mongodb",
+    "credentials": {
+      "connectionString": "mongodb+srv://hanadi:abs@cluster0.ubt9o.mongodb.net/",
+      "database": "test"
+    }
   }
 ]
