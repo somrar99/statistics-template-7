@@ -1,3 +1,7 @@
+addMdToPage("# Politisk förändring i Sverige mot bakgrund av överkomliga bostäder (2018-2022)");
+addToPage(`Valresultat 2018 och 2022: Hämtade från en Neo4j-baserad databas och omvandlades till JSON-format (neo4j.json). 
+  Det har skett lokala förändringar i svensk politik mellan 2018 och 2022, 
+  men den övergripande strukturen för partistöd har varit relativt stabil.`)
 
 let vansterPartier = ['Arbetarepartiet-Socialdemokraterna', 'Vänsterpartiet', 'Miljöpartiet de gröna', 'Centerpartiet'];
 let hogerPartier = ['Moderaterna', 'Kristdemokraterna', 'Liberalerna', 'Sverigedemokraterna'];
@@ -116,6 +120,9 @@ addToPage(`
     ${kommunerMedByte.length} kommuner har bytt vinnande parti
   </p>
 `);
+
+addToPage(`I många kommuner byttes valvinnaren ut, men de tre största partierna förblev desamma:
+Socialdemokraterna, Sverigedemokraterna och Moderaterna.`)
 
 
 /*
@@ -386,7 +393,7 @@ addMdToPage(`
 
 - **p-värde**: ${result.p.toFixed(4)}
 - ${result.p < 0.05
-    ? "❌ Fördelningen verkar inte vara normalfördelad"
+    ? "❌ Fördelningen verkar inte vara normalfördelad. Eftersom Shapiro-Wilks test gav ett p-värde på noll kan vi inte använda T-testet. Därför behöver vi istället vänja oss vid att arbeta med korrelationsberäkningar och olika icke-parametriska testmetoder."
     : "✅ Fördelningen verkar vara normalfördelad"}
 `);
 
@@ -466,17 +473,41 @@ let sämstKommun = sortablePriceToIncome[sortablePriceToIncome.length - 1]; // �
 addMdToPage(`
   ### 📈 Tillväxt i boendeaffordabilitet (2018–2022)
 
-  **Mest förbättrad tillgänglighet:**
-  - Kommun: **${bästKommun.kommun}**
-  - Tillväxt kvot: **${bästKommun['Tillväxt kvot (%)']}%**  
-  - Kvot 2018: **${bästKommun['Kvot 2018']}**
-  - Kvot 2022: **${bästKommun['Kvot 2022']}**
+Inkomstdata: Medellön per kommun för åren 2018 och 2022 från MongoDB-databas (kommun-info-mongodb).
 
-  **Mest försämrad tillgänglighet:**
+Huspriser: Medianpris på småhus per kommun från en SQLite-databas (HusPris-sqlite).
+[SCB: Fastpris på småhus per region och år](https://www.statistikdatabasen.scb.se/pxweb/sv/ssd/START__BO__BO0501__BO0501B/FastprisSHRegionAr/sortedtable/tableViewSorted)
+
+
+🏠 Bostadsrättsläget har försämrats nästan överallt.
+Studien visar att bostadsrättsläget (kvot pris/inkomst) har försämrats i de flesta kommuner.
+
+Den största försämringen observerades i kommuner som ${sämstKommun.kommun}, där överkomligheten minskade med mer än ${sämstKommun['Tillväxt kvot (%)']} procent.
+I några kommuner har situationen tvärtom förbättrats, men de är betydligt färre till antalet.
+
+Beräkningar:
+
+Boendeaffordabilitet:
+För varje kommun beräknades ett kvotmått som 
+
+Kvot = (Huspris) / (Inkomst) både för 2018 och 2022.
+
+Hur mycket kvoten förändrats mellan åren:
+
+Tillväxt kvot (%) = ((Kvot2022 - Kvot2018) / Kvot2018) × 100
+
+
+ **Mest försämrad tillgänglighet:**
   - Kommun: **${sämstKommun.kommun}**
   - Tillväxt kvot: **${sämstKommun['Tillväxt kvot (%)']}%**  
   - Kvot 2018: **${sämstKommun['Kvot 2018']}**
   - Kvot 2022: **${sämstKommun['Kvot 2022']}**
+
+  **Mest förbättrad tillgänglighet:**
+  - Kommun: **${bästKommun.kommun}**
+  - Tillväxt kvot: **${bästKommun['Tillväxt kvot (%)']}%**  
+  - Kvot 2018: **${bästKommun['Kvot 2018']}**
+  - Kvot 2022: **${bästKommun['Kvot 2022']}** 
 `);
 
 
@@ -565,6 +596,20 @@ let scatterDataCenterpartiet = combinedData
     tillvaxtKvot: r['Tillväxt kvot (%)'],
     diffProcent: r['Centerpartiet röster diff (%)']
   }));
+
+
+
+addMdToPage(`
+  ### 📊 Samband mellan bostadspris och förändring i politiskt stöd
+  
+Ett försök gjordes att identifiera om försämrad bostadspris påverkar förändringen i röster på partier.
+* Förändringen i antalet röster beräknas i relation till partiernas resultat från 2018, 
+där 2018 års röster sätts till 100 %. 
+Detta visar tydligare skillnader och hjälper till att identifiera trender. 
+Exempelvis tappade Centerpartiet upp till 60 % i en av kommun, medan vinnande partier ökade sitt stöd med upp till 65 %.
+
+**"Två partier som förlorade flest röster"** syftar på de partier som tappade mest i väljarstöd mellan valen 2018 och 2022.​
+`);
 //2. Рисуем ScatterChart для обеих партий:
 
 drawGoogleChart({
@@ -645,6 +690,11 @@ let scatterData = [
     r.sverigedemokraterna
   ])
 ];
+
+addMdToPage(`
+**"De tre kommuner där partierna behöll sina positioner"** 
+avser de kommuner där det vinnande partiet från 2018 lyckades behålla eller förstarka sin ledande position även i valet 2022.​
+`);
 //5. Рисуем красивый график:
 
 drawGoogleChart({
@@ -701,12 +751,21 @@ let sdR = s.sampleCorrelation(
 
 addMdToPage(`
   ### 📈 Samband mellan boendeaffordabilitet och partisupport (Pearson r)
+  Pearsons statistiska test gav korrelationskoefficienterna:
 
   - **Socialdemokraterna**: r = **${socialR.toFixed(3)}**
   - **Moderaterna**: r = **${moderatR.toFixed(3)}**
   - **Sverigedemokraterna**: r = **${sdR.toFixed(3)}**
 
   ${Math.abs(socialR) < 0.2 && Math.abs(moderatR) < 0.2 && Math.abs(sdR) < 0.2
-    ? "🔵 Det verkar inte finnas något starkt samband."
-    : "🔴 Vissa samband kan finnas!"}
+    ? "🔴 Detta tyder på att det inte finns någon stark direkt koppling mellan försämrade boendekostnader och förändringar i politiska preferenser på kommunnivå."
+    : "🔵 Vissa samband kan finnas!"}
 `);
+
+
+addMdToPage(`
+<h3>🎯 Trots försämrad bostadsaffordabilitet i många kommuner mellan 2018 och 2022, 
+visar analyserna att väljarnas lojalitet mot toppartierna i Sverige i stort sett förblev stabil. 
+Politisk förändring skedde mest på lokal nivå utan tydligt samband till boendeekonomiska faktorer.</h3>
+`);
+
