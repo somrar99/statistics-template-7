@@ -445,6 +445,7 @@ let priceToIncome = meddelHusPris.map(row => {
     'Tillväxt kvot (%)': +tillväxtKvot.toFixed(1)
   };
 });
+//tableFromData({ data: priceToIncome });
 
 
 //2. Сортируем:
