@@ -1,5 +1,5 @@
 let dbsInUse = await jload('/databases/databases-in-use.json');
-let neededDbs = ['counties-sqlite', 'geo-mysql', 'kommun-info-mongodb', 'riksdagsval-neo4j'];
+let neededDbs = ['counties-sqlite', 'geo-mysql', 'kommun-info-mongodb', 'riksdagsval-neo4j', 'test-mongodb'];
 export default neededDbs.map(x => !!dbsInUse.find(y => y.name == x)).every(x => x);
 
 export function displayDbNotOkText() {
