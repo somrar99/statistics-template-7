@@ -1,50 +1,81 @@
 addMdToPage(`
-  ## Hur hänger ålder och valresultat ihop?
 
-  Statistik handlar inte bara om siffror. Det handlar om människor, samhällen – och ibland, om hur vår ålder kan speglas i hur vi röstar. I det här projektet använder vi riktig data från två källor för att utforska ett möjligt samband mellan medelåldern i en kommun och hur invånarna röstar i riksdagsvalet.
+# Röd tråd – Vad vi velat undersöka
 
-  ### 🔢 1. Data – grunden till berättelsen
+I vårt projekt har vi undersökt hur valresultaten i riksdagsvalen 2018 och 2022 har förändrats, med fokus på att analysera sambandet mellan socioekonomiska faktorer (som utbildningsnivå och arbetslöshet) och utvecklingen av stödet för olika partier.  
+Syftet har varit att se om exempelvis förändringar i utbildning eller arbetslöshet kan kopplas till ökningar eller minskningar i partiers röstandelar.
 
-  Vi har samlat data från två olika databaser:
-  - Medelålder per kommun från MongoDB (2018–2022), där vi fokuserat på kön = "totalt".
-  - Valresultat från riksdagsvalet 2022 via en Neo4j-databas, där vi kan se hur många röster varje parti fått i varje kommun.
+Samtidigt har vi fördjupat oss i en särskild aspekt: sambandet mellan ålder och valresultat.  
+Vi ville utforska hur kommunernas medelålder kan spegla röstmönster i valet 2022, och om ålder kan vara en förklarande faktor bakom partiers framgångar eller motgångar.
 
-  Dessa två datakällor har vi kopplat ihop, så att varje rad i vår gemensamma datamängd innehåller:
-  - Kommunens namn
-  - Det aktuella partiet
-  - Antal röster 2022
-  - Kommunens medelålder 2022
+---
 
-  ### 🧭 2. Narrativ – vad vill vi berätta?
+## Hypoteser
 
-  Vi ställer frågan: *Finns det ett samband mellan en kommuns medelålder och hur många röster ett visst parti får?*
+Vi har arbetat utifrån flera hypoteser:
 
-  Det är ett beskrivande berättarsätt:
-  > Vad ser vi i datan, och kan vi ana några mönster?
+- Ökad arbetslöshet i en kommun leder till ökat stöd för partier som driver en politik för förändring eller opposition mot sittande regering.
+- Högre utbildningsnivå korrelerar med ökat stöd för partier som fokuserar på exempelvis miljöfrågor eller globalisering.
+- Områden med större ekonomiska utmaningar kan visa starkare stöd för partier som betonar trygghet och ekonomisk politik.
+- Medelåldern i en kommun kan påverka vilket parti som får flest röster, där yngre kommuner kan stödja vissa partier och äldre kommuner andra.
 
-  Genom en interaktiv dropdown kan användaren välja ett parti. Därefter visas ett scatterplot där varje punkt representerar en kommun. På x-axeln ser vi medelåldern, och på y-axeln antalet röster för det valda partiet.
+---
 
-  Exempel på mönster vi kan se:
-  - Miljöpartiet verkar ha fler röster i kommuner med lägre medelålder.
-  - Moderaterna visar starkt stöd i kommuner med något högre ålder.
-  - Kristdemokraterna får relativt höga toppar i vissa äldre kommuner.
+# Hur hänger ålder och valresultat ihop?
 
-  ###  3. Visualisering – vi ser mönstren tydligt
+Statistik handlar inte bara om siffror. Det handlar om människor, samhällen – och ibland om hur vår ålder kan speglas i hur vi röstar.
 
-  Diagrammet du ser är en scatterplot – en visuell karta av sambandet. Genom att välja olika partier kan du själv utforska:
-  - Om det finns något tydligt mönster
-  - Om stödet är jämnt över alla kommuner
-  - Eller om vissa partier är mer beroende av demografi
+I detta projekt använde vi data från två källor för att undersöka ett möjligt samband mellan medelåldern i en kommun och invånarnas röstande:
 
-  Denna visualisering gör det lätt att upptäcka sådant som annars skulle gömma sig i tusentals siffror.
+**Data – grunden till berättelsen:**
 
-  ###  Slutsats – vad betyder detta?
+- Medelålder per kommun från MongoDB (2018–2022), där vi fokuserat på kön = "totalt".
+- Valresultat från riksdagsvalet 2022 via en Neo4j-databas.
 
-  Statistiken visar inte exakta orsaker, men den ger oss möjligheter att förstå samhället bättre. I detta fall har vi kunnat se att ålder kan ha viss påverkan på hur olika kommuner röstar – men det är bara början.
+Vi kopplade ihop dessa datakällor så att varje rad i vår analys innehåller:
 
-  Nästa steg skulle kunna vara att inkludera fler variabler: utbildning, inkomst, urbanisering, eller region – och se hur dessa samverkar.
+- Kommunens namn
+- Partiets namn
+- Antal röster 2022
+- Kommunens medelålder 2022
 
-  Det här är statistikens kraft: att omvandla siffror till förståelse.
+---
+
+# Narrativ – vad vill vi berätta?
+
+Vi ställer frågan: **Finns det ett samband mellan en kommuns medelålder och hur många röster ett parti får?**
+
+Genom en interaktiv dropdown kan användaren välja ett parti och därefter se ett scatterplot där varje punkt motsvarar en kommun:
+
+- **X-axel:** Kommunens medelålder
+- **Y-axel:** Antalet röster för det valda partiet
+
+### Exempel på mönster vi observerat:
+
+- Miljöpartiet har fler röster i kommuner med lägre medelålder.
+- Moderaterna visar starkt stöd i kommuner med något högre ålder.
+- Kristdemokraterna får relativt höga toppar i vissa äldre kommuner.
+
+---
+
+# Visualisering – vi ser mönstren tydligt
+
+Scatterploten hjälper oss att lätt upptäcka mönster som annars skulle gömma sig i tusentals siffror:
+
+- Om stödet för partier är jämnt över kommunerna.
+- Om vissa partier är mer beroende av demografiska faktorer.
+
+---
+
+# Slutsats
+
+Statistiken visar inte exakta orsaker, men ger oss möjligheter att förstå samhället bättre.
+
+Vi har kunnat se att både socioekonomiska faktorer och ålder kan påverka hur kommunerna röstar.  
+Ålder verkar ha ett visst samband med partistöd, men för en djupare förståelse bör fler faktorer såsom utbildning, inkomst och urbanisering undersökas i framtida analyser.
+
+Det här visar statistikens kraft: att omvandla siffror till förståelse av vårt samhälle.
+
 `);
 
 addMdToPage(`
@@ -125,7 +156,7 @@ let valMedAlderFiltrerad = valMedAlder.filter(
 // Steg 1: Ladda data
 dbQuery.use("kommun-info-mongodb");
 let medelAlderRader = await dbQuery
-  .collection("ageByKommun").-
+  .collection("ageByKommun")
   .find({ kon: "totalt" });
 
 addMdToPage(`
@@ -133,6 +164,7 @@ addMdToPage(`
   Välj ett parti för att se sambandet mellan medelålder och valresultat i kommuner.
   <div id="chart-container" style="width: 100%; height: 500px;"></div>
 `);
+
 // Skapa plats för diagrammet – måste finnas i DOM
 
 let allaPartier = [...new Set(partirresultat.map((p) => p.parti))].sort();
