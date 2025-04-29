@@ -4,18 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="10f35af3-3cc0-4135-86fd-ef6dd4229fd0" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/js/hanadi.js" beforeDir="false" afterPath="$PROJECT_DIR$/js/hanadi.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/valresultat.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/valresultat_files/1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/valresultat_files/2.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/valresultat_files/4.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/valresultat_files/86ad76dc710171834824de18c5b57ca9" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/valresultat_files/conversation-small-hkgg670s.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/valresultat_files/root-hfcqfvbh.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/valresultat_files/saved_resource.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/valresultat_files/sora-mutf8tav.webp" beforeDir="false" />
-    </list>
+    <list default="true" id="10f35af3-3cc0-4135-86fd-ef6dd4229fd0" name="Changes" comment="update" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -36,7 +25,7 @@
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "hanadiTest",
+    "git-widget-placeholder": "main",
     "last_opened_file_path": "/Users/hanadialsalman/Documents/Statistisk/statistics-template-7",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -64,10 +53,46 @@
       <updated>1744633149297</updated>
       <workItem from="1744633150521" duration="5375000" />
       <workItem from="1745794465666" duration="11000" />
+      <workItem from="1745964108319" duration="672000" />
     </task>
+    <task id="LOCAL−00001" summary="update">
+      <option name="closed" value="true" />
+      <created>1745964560837</created>
+      <option name="number" value="LOCAL−00001" />
+      <option name="presentableId" value="LOCAL−00001" />
+      <updated>1745964560837</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="hanadiTest" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="update" />
+    <option name="LAST_COMMIT_MESSAGE" value="update" />
   </component>
 </project>
