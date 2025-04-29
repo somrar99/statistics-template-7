@@ -19,21 +19,12 @@ createMenu('Statistics Template JS', [
   //{ name: 'Visa ett år', script: 'one-year.js' },
   //{ name: 'Jämför två år', script: 'compare-two-years.js' },
   //{ name: 'Hitta trender', script: 'trends.js' },
-    { name: 'rula', script: 'rula.js' },
-  // { name: 'nadezda', script: 'nadezda.js' },
+  { name: 'rula', script: 'rula.js' },
+  { name: 'nadezda', script: 'nadezda.js' },
   {
-    name: 'Nadezda',
-    sub: [
-      { name: 'nadezda', script: 'nadezda.js' },
-      { name: 'husPris', script: 'husPris.js' }
+    name: "Inkomst", sub: [
+      { name: 'Kummun Inkomst', script: 'income/kommun-income.js' },
+      { name: 'Län Inkomst', script: 'income/lan-income.js' },
+      { name: 'Inkomst Vs Vinnande Parti', script: 'income/income-parti.js' }
     ]
-  },
-  { name: "Inkomst", sub: [
-    {name: 'Kummun Inkomst',script: 'income/kommun-income.js'},
-    {name: 'Län Inkomst', script: 'income/lan-income.js'},
-    {name: 'Inkomst Vs Vinnande Parti', script: 'income/income-parti.js'}
-  ]},
-  { name: 'hanadi', script: 'hanadi.js' },
-  { name: 'Kom igång!', script: 'startpage.js' },
-  { name: 'Övningsinstruktioner', script: 'instructions.js' }
-]);
+  })
