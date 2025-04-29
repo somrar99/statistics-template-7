@@ -20,6 +20,13 @@ createMenu('Statistics Template JS', [
   //{ name: 'Jämför två år', script: 'compare-two-years.js' },
   //{ name: 'Hitta trender', script: 'trends.js' },
   { name: 'rula', script: 'rula.js' },
+    {
+    name: 'Hanadi',
+    sub: [
+      { name: 'Statistik & DataAnalys & Shapiro-Wilk Test', script: 'dataAnalys.js' },
+      { name: 'Trend: Valresultat & Skattbetalning', script: 'trend.js' }
+    ]
+  },
   { name: 'nadezda', script: 'nadezda.js' },
   {
     name: "Inkomst", sub: [
