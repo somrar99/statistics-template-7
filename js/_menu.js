@@ -27,4 +27,4 @@ createMenu('Statistics Template JS', [
       { name: 'Län Inkomst', script: 'income/lan-income.js' },
       { name: 'Inkomst Vs Vinnande Parti', script: 'income/income-parti.js' }
     ]
-  })
+  }]);
