@@ -1,161 +1,238 @@
-(async () => {
-  // 📌 Introduktion
-  addMdToPage(`
-  ## Hur har stödet förändrats mellan 2018 och 2022?
+addMdToPage(`
 
-  Vi undersöker hur stödet för **Moderaterna (M)** och **Socialdemokraterna (S)** har förändrats i fem kommuner mellan riksdagsvalen 2018 och 2022.
-  `);
 
-  // 🎯 Frågeställning & Metod
-  addMdToPage(`
-  ## Frågeställning
+# Röd tråd – Vad vi velat undersöka
 
-  Hur har partistödet för M och S förändrats i kommuner med olika medelålder mellan 2018 och 2022?
 
-  ---
-  ## Metod
+I vårt projekt har vi undersökt hur valresultaten i riksdagsvalen 2018 och 2022 har förändrats, med fokus på att analysera sambandet mellan socioekonomiska faktorer (som utbildningsnivå och arbetslöshet) och utvecklingen av stödet för olika partier.  
+Syftet har varit att se om exempelvis förändringar i utbildning eller arbetslöshet kan kopplas till ökningar eller minskningar i partiers röstandelar.
 
-  Vi har använt data från **Valmyndigheten** (valresultat) och **SCB** (medelålder per kommun).  
-  Fem kommuner valdes: **Uppsala**, **Lidingö**, **Sigtuna**, **Täby** och **Botkyrka**.  
-  För varje kommun visas partistödet för M och S i både 2018 och 2022 i ett kolumndiagram.
-  `);
 
-  // 📊 Ladda och bearbeta data
-  const valresultat = await jload("valresultat.json");
-  const kommuner = ["Uppsala", "Lidingö", "Sigtuna", "Täby", "Botkyrka"];
+Samtidigt har vi fördjupat oss i en särskild aspekt: sambandet mellan ålder och valresultat.  
+Vi ville utforska hur kommunernas medelålder kan spegla röstmönster i valet 2022, och om ålder kan vara en förklarande faktor bakom partiers framgångar eller motgångar.
 
-  const medelåldrar = {
-    Uppsala: 39.1,
-    Lidingö: 42.2,
-    Sigtuna: 38.3,
-    Täby: 41.3,
-    Botkyrka: 37.5,
-  };
 
-  const diagramData = [["Kommun", "M 2018", "M 2022", "S 2018", "S 2022"]];
-  kommuner.forEach((kommun) => {
-    const k = valresultat.find((k) => k.kommun === kommun);
-    if (k) {
-      diagramData.push([
-        kommun,
-        k.val2018.M,
-        k.val2022.M,
-        k.val2018.S,
-        k.val2022.S,
-      ]);
-    }
-  });
+---
 
-  // 📊 Rita diagrammet
-  google.charts.load("current", { packages: ["corechart"] });
-  google.charts.setOnLoadCallback(() => {
-    const chart = new google.visualization.ComboChart(document.body);
-    const data = google.visualization.arrayToDataTable(diagramData);
-    chart.draw(data, {
-      title: "Förändring i partistöd 2018 vs 2022",
-      hAxis: { title: "Kommun", slantedText: true },
-      vAxis: { title: "Stöd (%)" },
-      legend: { position: "top" },
-      seriesType: "bars",
-      colors: ["#3366cc", "#1a73e8", "#d93025", "#ea4335"],
-    });
-  });
 
-  // 📈 Tolkning
-  addMdToPage(`
-  ## Tolkning
+## Hypoteser
 
-  - **Moderaterna (M)** har ökat i kommuner som **Lidingö**, **Täby** och **Uppsala**.
-  - **Socialdemokraterna (S)** har minskat något i dessa kommuner men behåller starkt stöd i **Sigtuna** och **Botkyrka**.
-  - Det tyder på att kommuner med högre medelålder röstar mer borgerligt.
 
-  ---
-  ## Slutsats
+Vi har arbetat utifrån flera hypoteser:
 
-  Det verkar finnas ett samband mellan **medelålder** i en kommun och hur väljarstödet förändras över tid.  
-  För att dra statistiskt säkra slutsatser rekommenderas vidare analys, t.ex. med **T-test** eller **regressionsanalys**.
-  `);
 
-  // 🔗 Koppling till annan analys
-  addMdToPage(`
-  ## Samband med medelålder
+- Ökad arbetslöshet i en kommun leder till ökat stöd för partier som driver en politik för förändring eller opposition mot sittande regering.
+- Högre utbildningsnivå korrelerar med ökat stöd för partier som fokuserar på exempelvis miljöfrågor eller globalisering.
+- Områden med större ekonomiska utmaningar kan visa starkare stöd för partier som betonar trygghet och ekonomisk politik.
+- Medelåldern i en kommun kan påverka vilket parti som får flest röster, där yngre kommuner kan stödja vissa partier och äldre kommuner andra.
 
-  När vi tittar på resultaten i dessa kommuner ser vi att **kommuner med hög medelålder**, som *Lidingö* och *Täby*, inte bara har **högre stöd för Moderaterna**, utan också har sett en **ökning i stödet för M mellan 2018 och 2022**.
 
-  I kontrast har **kommuner med lägre medelålder**, som *Sigtuna* och *Botkyrka*, behållit ett starkt stöd för **Socialdemokraterna (S)**.
+---
 
-  Detta stödjer tidigare analys från sidan *Medelålder och partistöd*, där vi såg en **korrelation mellan högre medelålder och borgerligt röstande**.
-  `);
 
-  // 🔘 Länk till annan sida
-  addHtmlToPage(`
-    <button onclick="location.href='#rula-test'" style="margin-top: 1em; padding: 10px 20px; font-size: 1rem; background-color: #1a73e8; color: white; border: none; border-radius: 5px; cursor: pointer;">
-      👉 Läs mer på sidan T-test Rula
-    </button>
-  `);
+# Hur hänger ålder och valresultat ihop?
 
-  // 📋 Medelålderstabell
-  addMdToPage(`
-  ## Medelålder i kommunerna (2022)
 
-  <table style="border-collapse: collapse; width: 100%; max-width: 600px;">
-    <thead>
-      <tr style="background-color: #f2f2f2;">
-        <th style="border: 1px solid #ddd; padding: 8px;">Kommun</th>
-        <th style="border: 1px solid #ddd; padding: 8px;">Medelålder</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${kommuner
-        .map(
-          (k, i) => `
-        <tr style="${i % 2 === 0 ? "" : "background-color: #fafafa;"}">
-          <td style="border: 1px solid #ddd; padding: 8px;">${k}</td>
-          <td style="border: 1px solid #ddd; padding: 8px;">${
-            medelåldrar[k]
-          } år</td>
-        </tr>
-      `
-        )
-        .join("")}
-    </tbody>
-  </table>
-  `);
+Statistik handlar inte bara om siffror. Det handlar om människor, samhällen – och ibland om hur vår ålder kan speglas i hur vi röstar.
 
-  // 🧩 Dropdown för att visa detaljer för vald kommun
-  addHtmlToPage(`
-    <h2 style="margin-top: 2em;">🔍 Välj kommun för detaljer</h2>
-    <select id="kommunDropdown" style="padding: 8px; font-size: 1rem;">
-      <option disabled selected>Välj kommun</option>
-      ${kommuner.map((k) => `<option value="${k}">${k}</option>`).join("")}
-    </select>
-    <div id="kommunInfo" style="margin-top: 1em; font-size: 1.1rem;"></div>
-  `);
 
-  document
-    .getElementById("kommunDropdown")
-    .addEventListener("change", function () {
-      const selected = this.value;
-      const info = valresultat.find((k) => k.kommun === selected);
-      const alder = medelåldrar[selected];
+I detta projekt använde vi data från två källor för att undersöka ett möjligt samband mellan medelåldern i en kommun och invånarnas röstande:
 
-      if (info) {
-        document.getElementById("kommunInfo").innerHTML = `
-        <strong>${selected}</strong><br/>
-        🧓 Medelålder: <b>${alder}</b> år<br/>
-        🟦 Moderaterna:<br/>
-        &nbsp;&nbsp;• 2018: <b>${info.val2018.M}%</b><br/>
-        &nbsp;&nbsp;• 2022: <b>${info.val2022.M}%</b><br/>
-        🟥 Socialdemokraterna:<br/>
-        &nbsp;&nbsp;• 2018: <b>${info.val2018.S}%</b><br/>
-        &nbsp;&nbsp;• 2022: <b>${info.val2022.S}%</b><br/>
-        <br/>
-        <em>${
-          alder > 40
-            ? "Denna kommun har hög medelålder – stöd för M är ofta starkare."
-            : "Denna kommun har lägre medelålder – stöd för S är ofta högre."
-        }</em>
-      `;
-      }
-    });
-})();
+
+**Data – grunden till berättelsen:**
+
+
+- Medelålder per kommun från MongoDB (2018–2022), där vi fokuserat på kön = "totalt".
+- Valresultat från riksdagsvalet 2022 via en Neo4j-databas.
+
+
+Vi kopplade ihop dessa datakällor så att varje rad i vår analys innehåller:
+
+
+- Kommunens namn
+- Partiets namn
+- Antal röster 2022
+- Kommunens medelålder 2022
+
+
+---
+
+
+# Narrativ – vad vill vi berätta?
+
+
+Vi ställer frågan: **Finns det ett samband mellan en kommuns medelålder och hur många röster ett parti får?**
+
+
+Genom en interaktiv dropdown kan användaren välja ett parti och därefter se ett scatterplot där varje punkt motsvarar en kommun:
+
+
+- **X-axel:** Kommunens medelålder
+- **Y-axel:** Antalet röster för det valda partiet
+
+
+### Exempel på mönster vi observerat:
+
+
+- Miljöpartiet har fler röster i kommuner med lägre medelålder.
+- Moderaterna visar starkt stöd i kommuner med något högre ålder.
+- Kristdemokraterna får relativt höga toppar i vissa äldre kommuner.
+
+
+---
+
+
+# Visualisering – vi ser mönstren tydligt
+
+
+Scatterploten hjälper oss att lätt upptäcka mönster som annars skulle gömma sig i tusentals siffror:
+
+
+- Om stödet för partier är jämnt över kommunerna.
+- Om vissa partier är mer beroende av demografiska faktorer.
+
+
+---
+
+
+# Slutsats
+
+
+Statistiken visar inte exakta orsaker, men ger oss möjligheter att förstå samhället bättre.
+
+
+Vi har kunnat se att både socioekonomiska faktorer och ålder kan påverka hur kommunerna röstar.  
+Ålder verkar ha ett visst samband med partistöd, men för en djupare förståelse bör fler faktorer såsom utbildning, inkomst och urbanisering undersökas i framtida analyser.
+
+
+Det här visar statistikens kraft: att omvandla siffror till förståelse av vårt samhälle.
+
+
+`);
+
+addMdToPage(`
+  ### Medelålder, per kommun, från MongoDB  
+  (Endast de 10 första posterna med kön = "totalt".)  
+`);
+
+dbQuery.use("kommun-info-mongodb");
+
+//vi ska göra en väriabel vilken innehåller hela databas
+let kommonmedelålder = await dbQuery
+  .collection("ageByKommun")
+  .find({ kon: "totalt" });
+// Hämta endast poster där kon är "totalt"
+let ages = await dbQuery
+  .collection("ageByKommun")
+  .find({ kon: "totalt" })
+  .limit(10);
+
+// Ta bort kolumnen _id
+let filtreradeAldrar = ages.map(({ _id, ...resten }) => resten);
+
+// Visa tabellen utan _id och bara med "totalt"
+tableFromData({ data: filtreradeAldrar });
+
+dbQuery.use("riksdagsval-neo4j");
+let electionResults = await dbQuery("MATCH (n:Partiresultat) RETURN n LIMIT 5");
+tableFromData({
+  data: electionResults
+    // egenskaper/kolumner kommer i lite konstig ordning från Neo - mappa i trevligare ordning
+    .map(({ ids, kommun, roster2018, roster2022, parti, labels }) => ({
+      ids: ids.identity,
+      kommun,
+      roster2018,
+      roster2022,
+      parti,
+      labels,
+    })),
+});
+//console.log("electionResults from neo4j", electionResults);
+
+//Skapa en väriabel som innhåller obegränsat databas från neo4j
+let partirresultat = await dbQuery("MATCH (n:Partiresultat) RETURN n");
+
+partirresultat.forEach((x) => (x.parti = x.parti.trim())); // eftersom mellanslag från databas efter Liberalerna, trimma (ta bort mellanslag i början och slutet av partinamn)
+
+// Skapa en lookup-tabell per kommun från MongoDB
+let medelAlderPerKommun = {};
+kommonmedelålder.forEach((row) => {
+  if (row.kommun && row.medelalderAr2022) {
+    medelAlderPerKommun[row.kommun] = row.medelalderAr2022;
+  }
+});
+
+// Skapa ny lista där vi kopplar ihop varje partirresultat med medelålder
+let valMedAlder = partirresultat.map(
+  ({ ids, kommun, roster2018, roster2022, parti, labels }) => {
+    return {
+      kommun,
+      parti,
+      roster2022,
+      medelalder: medelAlderPerKommun[kommun] || null,
+    };
+  }
+);
+
+// Filtrera bort kommuner där medelålder saknas (null)
+let valMedAlderFiltrerad = valMedAlder.filter(
+  (item) => item.medelalder !== null
+);
+
+// Visa tabell
+//tableFromData({ data: valMedAlderFiltrerad });
+
+// För felsökning i konsolen (frivilligt)
+//console.log("Sammanfogad data:", valMedAlderFiltrerad);
+
+// Steg 1: Ladda data
+dbQuery.use("kommun-info-mongodb");
+let medelAlderRader = await dbQuery
+  .collection("ageByKommun")
+  .find({ kon: "totalt" });
+
+addMdToPage(`
+  ### Samband mellan medelålder och antal röster  
+  Välj ett parti för att se sambandet mellan medelålder och valresultat i kommuner.
+  <div id="chart-container" style="width: 100%; height: 500px;"></div>
+`);
+
+// Skapa plats för diagrammet – måste finnas i DOM
+
+let allaPartier = [...new Set(partirresultat.map((p) => p.parti))].sort();
+//console.log("Alla partier (options till dropdown):", allaPartier);
+console.log(
+  "Typ av allaPartier:",
+  typeof allaPartier,
+  Array.isArray(allaPartier)
+);
+
+// Dropdown för att välja parti
+let valtParti = addDropdown("Parti-val:", allaPartier);
+
+// Filtrera på valt parti
+let filtrerat = partirresultat
+  .filter((p) => p.parti === valtParti)
+  .map((p) => ({
+    kommun: p.kommun,
+    medelalder: medelAlderPerKommun[p.kommun],
+    roster: p.roster2022,
+  }));
+
+console.log(filtrerat);
+
+// Rita scatterplot
+//console.log("Filtrerat data:", filtrerat);
+
+drawGoogleChart({
+  type: "ScatterChart",
+  data: makeChartFriendly(filtrerat),
+  options: {
+    height: 500,
+    chartArea: { left: 50, right: 0 },
+    curveType: "function",
+    pointSize: 5,
+    pointShape: "circle",
+    title: ``,
+  },
+});
