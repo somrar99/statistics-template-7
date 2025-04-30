@@ -14,21 +14,21 @@ globalThis.electionResultsForWork = electionResultsForWork;
 globalThis.sammanstallning = sammanstallning;
 globalThis.grupperadElectionResultsForWork = grupperadElectionResultsForWork;
 
-createMenu('Statistics Template JS', [
+createMenu('Riksdagensval med olika faktorer:', [
   //{ name: 'Nytt i version 7', script: 'new-in-v7.js' },
   //{ name: 'Visa ett år', script: 'one-year.js' },
   //{ name: 'Jämför två år', script: 'compare-two-years.js' },
   //{ name: 'Hitta trender', script: 'trends.js' },
-  { name: 'rula', script: 'rula.js' },
-    {
-    name: 'Hanadi',
+  { name: 'Meddelålder', script: 'rula.js' },
+  {
+    name: 'Skatt',
     sub: [
       { name: 'Statistik & DataAnalys & Shapiro-Wilk Test', script: 'dataAnalys.js' },
       { name: 'Trend: Valresultat & Skattbetalning', script: 'trend.js' }
     ]
   },
-  { name: 'nadezda', script: 'nadezda.js' },
-  { name: 'Huma', script: 'Huma.js' },
+  { name: 'Boendeaffordabilitet', script: 'nadezda.js' },
+  { name: 'Utbildning', script: 'Huma.js' },
   {
     name: "Inkomst", sub: [
       { name: 'Kummun Inkomst', script: 'income/kommun-income.js' },
