@@ -1,52 +1,82 @@
 addMdToPage(`
 
 
+
+
 # Röd tråd – Vad vi velat undersöka
+
+
 
 
 I vårt projekt har vi undersökt hur valresultaten i riksdagsvalen 2018 och 2022 har förändrats, med fokus på att analysera sambandet mellan socioekonomiska faktorer (som utbildningsnivå och arbetslöshet) och utvecklingen av stödet för olika partier.  
 Syftet har varit att se om exempelvis förändringar i utbildning eller arbetslöshet kan kopplas till ökningar eller minskningar i partiers röstandelar.
 
 
+
+
 Samtidigt har vi fördjupat oss i en särskild aspekt: sambandet mellan ålder och valresultat.  
 Vi ville utforska hur kommunernas medelålder kan spegla röstmönster i valet 2022, och om ålder kan vara en förklarande faktor bakom partiers framgångar eller motgångar.
+
+
 
 
 ---
 
 
+
+
 ## Hypoteser
+
+
 
 
 Vi har arbetat utifrån flera hypoteser:
 
 
 
+
+- Ökad arbetslöshet i en kommun leder till ökat stöd för partier som driver en politik för förändring eller opposition mot sittande regering.
 - Högre utbildningsnivå korrelerar med ökat stöd för partier som fokuserar på exempelvis miljöfrågor eller globalisering.
 - Områden med större ekonomiska utmaningar kan visa starkare stöd för partier som betonar trygghet och ekonomisk politik.
 - Medelåldern i en kommun kan påverka vilket parti som får flest röster, där yngre kommuner kan stödja vissa partier och äldre kommuner andra.
 
 
+
+
 ---
+
+
 
 
 # Hur hänger ålder och valresultat ihop?
 
 
+
+
 Statistik handlar inte bara om siffror. Det handlar om människor, samhällen – och ibland om hur vår ålder kan speglas i hur vi röstar.
+
+
 
 
 I detta projekt använde vi data från två källor för att undersöka ett möjligt samband mellan medelåldern i en kommun och invånarnas röstande:
 
 
+
+
 **Data – grunden till berättelsen:**
+
+
 
 
 - Medelålder per kommun från MongoDB (2018–2022), där vi fokuserat på kön = "totalt".
 - Valresultat från riksdagsvalet 2022 via en Neo4j-databas.
 
 
+
+
 Vi kopplade ihop dessa datakällor så att varje rad i vår analys innehåller:
+
+
 
 
 - Kommunens namn
@@ -55,23 +85,37 @@ Vi kopplade ihop dessa datakällor så att varje rad i vår analys innehåller:
 - Kommunens medelålder 2022
 
 
+
+
 ---
+
+
 
 
 # Narrativ – vad vill vi berätta?
 
 
+
+
 Vi ställer frågan: **Finns det ett samband mellan en kommuns medelålder och hur många röster ett parti får?**
 
 
+
+
 Genom en interaktiv dropdown kan användaren välja ett parti och därefter se ett scatterplot där varje punkt motsvarar en kommun:
+
+
 
 
 - **X-axel:** Kommunens medelålder
 - **Y-axel:** Antalet röster för det valda partiet
 
 
+
+
 ### Exempel på mönster vi observerat:
+
+
 
 
 - Miljöpartiet har fler röster i kommuner med lägre medelålder.
@@ -79,33 +123,53 @@ Genom en interaktiv dropdown kan användaren välja ett parti och därefter se e
 - Kristdemokraterna får relativt höga toppar i vissa äldre kommuner.
 
 
+
+
 ---
+
+
 
 
 # Visualisering – vi ser mönstren tydligt
 
 
+
+
 Scatterploten hjälper oss att lätt upptäcka mönster som annars skulle gömma sig i tusentals siffror:
+
+
 
 
 - Om stödet för partier är jämnt över kommunerna.
 - Om vissa partier är mer beroende av demografiska faktorer.
 
 
+
+
 ---
+
+
 
 
 # Slutsats
 
 
+
+
 Statistiken visar inte exakta orsaker, men ger oss möjligheter att förstå samhället bättre.
+
+
 
 
 Vi har kunnat se att både socioekonomiska faktorer och ålder kan påverka hur kommunerna röstar.  
 Ålder verkar ha ett visst samband med partistöd, men för en djupare förståelse bör fler faktorer såsom utbildning, inkomst och urbanisering undersökas i framtida analyser.
 
 
+
+
 Det här visar statistikens kraft: att omvandla siffror till förståelse av vårt samhälle.
+
+
 
 
 `);
@@ -209,7 +273,7 @@ console.log(
 
 // Dropdown för att välja parti
 let valtParti = addDropdown("Parti-val:", allaPartier);
-
+/*
 // Filtrera på valt parti
 let filtrerat = partirresultat
   .filter((p) => p.parti === valtParti)
@@ -234,5 +298,49 @@ drawGoogleChart({
     pointSize: 5,
     pointShape: "circle",
     title: ``,
+  },
+});
+*/
+
+// Skapa en lookup-tabell: totalröster per kommun
+let totalRosterPerKommun = {};
+partirresultat.forEach((p) => {
+  if (!totalRosterPerKommun[p.kommun]) {
+    totalRosterPerKommun[p.kommun] = 0;
+  }
+  totalRosterPerKommun[p.kommun] += p.roster2022;
+});
+
+let filtrerat = partirresultat
+  .filter((p) => p.parti === valtParti && medelAlderPerKommun[p.kommun])
+  .map((p) => {
+    let totalRoster = totalRosterPerKommun[p.kommun] || 1; // för att undvika division med 0
+    let procent = (p.roster2022 / totalRoster) * 100;
+    return {
+      kommun: p.kommun,
+      medelalder: medelAlderPerKommun[p.kommun],
+      procent: procent,
+    };
+  });
+
+drawGoogleChart({
+  type: "ScatterChart",
+  data: makeChartFriendly(
+    filtrerat.map(({ kommun, medelalder, procent }) => ({
+      kommun,
+      medelalder,
+      procent,
+    }))
+  ),
+  options: {
+    title: `📍 ${valtParti} – röstandel (%) per kommun i relation till medelålder`,
+    hAxis: { title: "Medelålder i kommunen (2022)" },
+    vAxis: { title: "Röstandel för partiet (%)" },
+    height: 500,
+    pointSize: 6,
+    pointShape: "circle",
+    chartArea: { left: 70, top: 60, right: 30, bottom: 70 },
+    legend: "none",
+    colors: ["#3366cc"],
   },
 });
