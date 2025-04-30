@@ -135,9 +135,9 @@ drawGoogleChart({
   type: 'BarChart',
   data: makeChartFriendly(top5Year2018, 'Kommun', 'MedelInkomst'),
   options: {
-    height: 500,
+    height:400,
     legend: { position: 'none' },
-    vAxis: { 
+    hAxis: { 
       format: '#',
       minValue:400,
       maxValue:700,
@@ -152,9 +152,9 @@ drawGoogleChart({
   type: 'BarChart',
   data: makeChartFriendly(top5Year2022, 'Kommun', 'MedelInkomst'),
   options: {
-    height: 500,
+    height: 400,
     legend: { position: 'none' },
-    vAxis: { 
+    hAxis: { 
       format: '#',
       minValue:400,
       maxValue:700,
@@ -208,8 +208,12 @@ drawGoogleChart({
     pointShape: 'circle',
     vAxis: { 
       format: '#',
-      minValue:250,
+      minValue:200,
       maxValue:500,
+      viewWindow: {
+        min: 200, 
+        max: 500  
+      },
       title:"TSEK"
      },
     hAxis: {
@@ -241,8 +245,12 @@ drawGoogleChart({
     pointShape: 'circle',
     vAxis: { 
       format: '#',
-      minValue:250,
+      minValue:200,
       maxValue:500,
+      viewWindow: {
+        min: 200, 
+        max: 500  
+      },
       title:"TSEK"
      },
     hAxis: {
