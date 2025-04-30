@@ -1,3 +1,7 @@
+addMdToPage(`# Samband mellan medelinkomst och vinnande parti
+  - en jämförelse mellan 2018 och 2022`);
+
+
 dbQuery.use('kommun-info-mongodb');
 let incomeRawData = await dbQuery.collection('incomeByKommun').find({});
 //console.log('raw income data from mongodb', incomeRawData);
@@ -113,9 +117,31 @@ function drawScatterChart(dataArray, containerId, chartTitle) {
     },
     legend: 'none',
     tooltip: { isHtml: true },
+    //width: 800,
     height: 450
   };
 
   const chart = new google.visualization.ScatterChart(document.getElementById(containerId));
   chart.draw(data, options);
 }
+
+
+addMdToPage(`# slutsatser
+Diagrammen ovan visar relationen mellan medelinkomst (TSEK) och vilket parti som vann i olika områden under valåren 2018 och 2022. Tre huvudmönster framträder tydligt:
+
+1. Socioekonomisk förankring av partierna
+Socialdemokraterna (röd markör) vann framförallt i områden med lägre medelinkomst, ofta under 400 TSEK. 
+Moderaterna (grön) dominerade i områden med medel till hög medelinkomst,
+ medan Sverigedemokraterna (gul) hade starkast stöd i områden med låg till medelhög inkomstnivå, ofta mellan 250 och 350 TSEK.
+
+2. Stabilitet över tid
+Mönstret är i stort sett oförändrat mellan 2018 och 2022.
+Detta antyder att inkomstnivåns koppling till partisympati har varit stabil under perioden.
+
+3. Partispecifika inkomstspann
+Varje partis stöd är koncentrerat till olika inkomstnivåer.
+ Det tyder på att ekonomiska förhållanden har fortsatt starkt samband med politiska preferenser, 
+ vilket är särskilt tydligt i den relativa separationen mellan Socialdemokraternas och Moderaternas väljarbaser.
+
+Sammantaget visar analysen att inkomstnivån är en avgörande faktor för vilket parti som vinner i ett visst område, och att detta mönster är bestående över tid.
+`);
