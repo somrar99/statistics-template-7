@@ -28,10 +28,11 @@ createMenu('Statistics Template JS', [
     ]
   },
   { name: 'nadezda', script: 'nadezda.js' },
+  { name: 'Huma', script: 'Huma.js' },
   {
     name: "Inkomst", sub: [
       { name: 'Kummun Inkomst', script: 'income/kommun-income.js' },
-      { name: 'Län Inkomst', script: 'income/lan-income.js' },
+      //{ name: 'Län Inkomst', script: 'income/lan-income.js' },
       { name: 'Inkomst Vs Vinnande Parti', script: 'income/income-parti.js' }
     ]
   }]);

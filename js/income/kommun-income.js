@@ -32,11 +32,146 @@ incomeDataForTable.sort((a, b) => {
 //tableFromData({data:incomeDataForTable});
 
 
+let totaltIncome = incomeDataForTable.filter(x=>x.kön ==='totalt')
+.map(x=>({
+  kommun: x.kommun,
+  medelInkomst2018:x.medelInkomst2018,
+  medelInkomst2022: x.medelInkomst2022}));
+
+//tableFromData({data:totaltIncome});
+
+
+// get medelInkomst2018 
+const income2018List = totaltIncome.map(x => parseFloat(x.medelInkomst2018));
+
+//console.log('income2018List', income2018List)
+
+drawGoogleChart({
+  elementId: 'income_histogram_2018', 
+  type: 'Histogram',
+  data: makeChartFriendly(
+    income2018List.map(x => ({ x })),
+    'Medelinkomst2018'
+  ),
+  options: {
+    height: 400,
+    histogram: { bucketSize: 10 },
+    legend: { position: 'none' },
+    hAxis: {
+    slantedText: true, 
+    slantedTextAngle: 45
+    //ticks: [220, 240, 260, 280]
+    },
+    title: `Medelinkomst2018`
+  
+  }
+});
+
+// get medelInkomst2022
+const income2022List = totaltIncome.map(x => parseFloat(x.medelInkomst2022));
+
+//console.log('income2018List', income2018List)
+
+drawGoogleChart({
+  elementId: 'income_histogram_2022', 
+  type: 'Histogram',
+  data: makeChartFriendly(
+    income2018List.map(x => ({ x })),
+    'Medelinkomst2022'
+  ),
+  options: {
+    height: 400,
+    histogram: { bucketSize: 10 },
+    legend: { position: 'none' },
+    hAxis: {
+    slantedText: true, 
+    slantedTextAngle: 45
+    //ticks: [220, 240, 260, 280]
+    },
+  title: `Medelinkomst2022`
+  
+  }
+});
+
+//console.log('income2018List',income2018List);
+
+const result = stdLib.stats.shapiroWilkTest(income2018List);
+
+//console.log('Shapiro-Wilk P-value:', result.p.toExponential(6));
+
+
+addMdToPage(`
+### 📐 Shapiro-Wilk normalitetstest för kommun inkomst
+
+- **p-värde**: ${result.p.toExponential(6)}
+- ${result.p < 0.05
+    ? "❌ Inkomst verkar inte vara normalfördelad."
+    : "✅ Inkomst verkar vara normalfördelad"}
+`);
+
+
+
+let top5Year2018 = totaltIncome
+  .map(x=>({kommun:x.kommun,medelInkomst2018:x.medelInkomst2018}))
+  .sort((a, b) => b.medelInkomst2018 - a.medelInkomst2018)
+  .slice(0, 5);
+
+console.log("Top 5 kommuner by income 2018:");
+top5Year2018.forEach(item => {
+  console.log(`${item.kommun}: ${item.medelInkomst2018} TSEK`);
+});
+
+let top5Year2022 = totaltIncome
+  .map(x=>({kommun:x.kommun,medelInkomst2022:x.medelInkomst2022}))
+  .sort((a, b) => b.medelInkomst2022 - a.medelInkomst2022)
+  .slice(0, 5);
+
+console.log("Top 5 kommuner by income 2022:");
+top5Year2022.forEach(item => {
+  console.log(`${item.kommun}: ${item.medelInkomst2022} TSEK`);
+});
+
+drawGoogleChart({
+  type: 'BarChart',
+  data: makeChartFriendly(top5Year2018, 'Kommun', 'MedelInkomst'),
+  options: {
+    height:400,
+    legend: { position: 'none' },
+    hAxis: { 
+      format: '#',
+      minValue:400,
+      maxValue:700,
+      title:"TSEK"
+     },
+    chartArea: { left: 100, right: 200 },
+    title: `Top 5 Medelinkomst Kommun 2018`
+  }
+});
+
+drawGoogleChart({
+  type: 'BarChart',
+  data: makeChartFriendly(top5Year2022, 'Kommun', 'MedelInkomst'),
+  options: {
+    height: 400,
+    legend: { position: 'none' },
+    hAxis: { 
+      format: '#',
+      minValue:400,
+      maxValue:700,
+      title:"TSEK"
+     },
+    chartArea: { left: 100, right: 200 },
+    title: `Top 5 Medelinkomst Kommun 2022`
+  }
+});
+
+
+
 const kommunList = [...new Set(income.map(x => x.kommun))].sort();
 //console.log('kommunList', kommunList); 
 
 const könList = [...new Set(income.map(x => x.kon))].sort();
-console.log('könList', könList,''); 
+//console.log('könList', könList,''); 
 
 const years = [2018, 2019, 2020, 2021, 2022];
 
@@ -73,8 +208,12 @@ drawGoogleChart({
     pointShape: 'circle',
     vAxis: { 
       format: '#',
-      minValue:250,
+      minValue:200,
       maxValue:500,
+      viewWindow: {
+        min: 200, 
+        max: 500  
+      },
       title:"TSEK"
      },
     hAxis: {
@@ -106,8 +245,12 @@ drawGoogleChart({
     pointShape: 'circle',
     vAxis: { 
       format: '#',
-      minValue:250,
+      minValue:200,
       maxValue:500,
+      viewWindow: {
+        min: 200, 
+        max: 500  
+      },
       title:"TSEK"
      },
     hAxis: {
@@ -116,4 +259,4 @@ drawGoogleChart({
     },
     title: `${kommun2} Kommun`
   }
-});
+}); 
