@@ -21,7 +21,7 @@ Vi ville utforska hur kommunernas medelålder kan spegla röstmönster i valet 2
 Vi har arbetat utifrån flera hypoteser:
 
 
-- Ökad arbetslöshet i en kommun leder till ökat stöd för partier som driver en politik för förändring eller opposition mot sittande regering.
+
 - Högre utbildningsnivå korrelerar med ökat stöd för partier som fokuserar på exempelvis miljöfrågor eller globalisering.
 - Områden med större ekonomiska utmaningar kan visa starkare stöd för partier som betonar trygghet och ekonomisk politik.
 - Medelåldern i en kommun kan påverka vilket parti som får flest röster, där yngre kommuner kan stödja vissa partier och äldre kommuner andra.
