@@ -1,5 +1,5 @@
 addMdToPage(`# Samband mellan medelinkomst och vinnande parti
-  - en jämförelse mellan 2018 och 2022`);
+   en jämförelse mellan 2018 och 2022`);
 
 
 dbQuery.use('kommun-info-mongodb');
@@ -127,7 +127,7 @@ function drawScatterChart(dataArray, containerId, chartTitle) {
 
 
 addMdToPage(`# slutsatser
-Diagrammen ovan visar relationen mellan medelinkomst (TSEK) och vilket parti som vann i olika områden under valåren 2018 och 2022. Tre huvudmönster framträder tydligt:
+Diagrammen visar relationen mellan medelinkomst (TSEK) och vilket parti som vann i olika områden under valåren 2018 och 2022. Tre huvudmönster framträder tydligt:
 
 1. Socioekonomisk förankring av partierna
 Socialdemokraterna (röd markör) vann framförallt i områden med lägre medelinkomst, ofta under 400 TSEK. 
