@@ -28,7 +28,7 @@ createMenu('Riksdagensval med olika faktorer:', [
     ]
   },
   { name: 'Boendeaffordabilitet', script: 'nadezda.js' },
-  { name: 'Utbildning', script: 'Huma.js' },
+  { name: 'Utbildning', script: 'HumaR1.js' },
   {
     name: "Inkomst", sub: [
       { name: 'Kummun Inkomst', script: 'income/kommun-income.js' },
