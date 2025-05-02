@@ -34,6 +34,22 @@
     }
   },
   {
+    "name": "utbildningdb3-mongodb",
+    "type": "mongodb",
+    "credentials": {
+      "connectionString": "mongodb+srv://humara123:_MBL2016v@cluster0.k6hgppr.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+      "database": "utbildningdb3"
+    }
+  },
+  {
+    "name": "utbildningdb3-mongodb",
+    "type": "mongodb",
+    "credentials": {
+      "connectionString": "mongodb+srv://humara123:_MBL2016v@cluster0.k6hgppr.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+      "database": "utbildningdb3"
+    }
+  },
+  {
     "name": "riksdagsval-neo4j",
     "type": "neo4j",
     "credentials": {
